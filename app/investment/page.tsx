@@ -197,6 +197,15 @@ export default function InvestmentPage() {
                     domain={[0, 100]}
                     tick={{ fill: "var(--muted-foreground)", fontSize: 9 }}
                   />
+                  <Tooltip
+                    contentStyle={{
+                      backgroundColor: "var(--card)",
+                      border: "1px solid var(--border)",
+                      borderRadius: "8px",
+                      backdropFilter: "blur(8px)",
+                    }}
+                    labelStyle={{ color: "var(--card-foreground)" }}
+                  />
                   <Radar
                     name="Score"
                     dataKey="score"
@@ -366,7 +375,7 @@ export default function InvestmentPage() {
               </div>
               <div className="text-right">
                 <div className="text-2xl font-bold gradient-text">
-                  <AnimatedCounter end={avgReadinessScore} suffix="%" />
+                  {avgReadinessScore}%
                 </div>
                 <span className="text-xs text-success">Series B Ready</span>
               </div>

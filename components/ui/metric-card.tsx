@@ -3,6 +3,7 @@
 import { ReactNode } from "react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { AnimatedCounter } from "./animated-counter"
+import { GlowCard } from "./glow-card"
 
 interface MetricCardProps {
   title: string
@@ -47,51 +48,56 @@ export function MetricCard({
       : "#06B6D4"
 
   return (
-    <Card
-      className={`opacity-0 animate-fade-in-up card-hover h-full ${status ? `status-${status}` : ""}`}
-      style={{ animationDelay: `${delay}ms`, ["--spark-color" as any]: sparkColor }}
+    <GlowCard
+      status={status || "neutral"}
+      className="opacity-0 animate-fade-in-up h-full"
     >
-      <CardHeader className="flex flex-row items-center justify-between pb-2">
-        <CardTitle className="text-sm font-medium">{title}</CardTitle>
-        {Icon && <Icon className={`w-5 h-5 ${statusColor}`} />}
-      </CardHeader>
+      <Card
+        className={`card-hover h-full bg-transparent border-0 ${status ? `status-${status}` : ""}`}
+        style={{ animationDelay: `${delay}ms`, ["--spark-color" as any]: sparkColor }}
+      >
+        <CardHeader className="flex flex-row items-center justify-between pb-2">
+          <CardTitle className="text-sm font-medium">{title}</CardTitle>
+          {Icon && <Icon className={`w-5 h-5 ${statusColor}`} />}
+        </CardHeader>
 
-      <CardContent>
-        <div className="text-2xl font-bold">
-          {typeof value === "number" ? (
-            <AnimatedCounter value={value as number} />
-          ) : typeof value === "string" && value.trim().endsWith("%") && !isNaN(Number(value.replace(/[^0-9.-]+/g, ""))) ? (
-            <>
-              <AnimatedCounter value={Number(value.replace(/[^0-9.-]+/g, ""))} />%
-            </>
-          ) : (
-            value
-          )}
-        </div>
-
-        {subtitle && (
-          <p className="text-xs text-muted-foreground mt-1">
-            {subtitle}
-          </p>
-        )}
-
-        {sparkline && sparkline.length > 0 && (
-          <div className="mt-3" style={{ ["--spark-color" as any]: sparkColor }}>
-            <Sparkline data={sparkline} delay={delay} />
+        <CardContent>
+          <div className="text-2xl font-bold">
+            {typeof value === "number" ? (
+              <AnimatedCounter value={value as number} />
+            ) : typeof value === "string" && value.trim().endsWith("%") && !isNaN(Number(value.replace(/[^0-9.-]+/g, ""))) ? (
+              <>
+                <AnimatedCounter value={Number(value.replace(/[^0-9.-]+/g, ""))} />%
+              </>
+            ) : (
+              value
+            )}
           </div>
-        )}
 
-        {trend && (
-          <p className="mt-2 text-xs text-muted-foreground">
-            <span className={trend.value >= 0 ? "text-success" : "text-destructive"}>
-              {trend.value >= 0 ? "+" : ""}
-              {trend.value}%
-            </span>{" "}
-            {trend.label}
-          </p>
-        )}
-      </CardContent>
-    </Card>
+          {subtitle && (
+            <p className="text-xs text-muted-foreground mt-1">
+              {subtitle}
+            </p>
+          )}
+
+          {sparkline && sparkline.length > 0 && (
+            <div className="mt-3" style={{ ["--spark-color" as any]: sparkColor }}>
+              <Sparkline data={sparkline} delay={delay} />
+            </div>
+          )}
+
+          {trend && (
+            <p className="mt-2 text-xs text-muted-foreground">
+              <span className={trend.value >= 0 ? "text-success" : "text-destructive"}>
+                {trend.value >= 0 ? "+" : ""}
+                {trend.value}%
+              </span>{" "}
+              {trend.label}
+            </p>
+          )}
+        </CardContent>
+      </Card>
+    </GlowCard>
   )
 }
 

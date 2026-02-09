@@ -250,6 +250,7 @@ function AIConfidenceCard() {
 
 function SummaryCard({ count, label, status, className = "" }: { count: number; label: string; status: "success" | "warning" | "danger"; className?: string }) {
   const styles = { success: "border-t-success", warning: "border-t-warning", danger: "border-t-destructive" }
+  const glowColors = { success: "green" as const, warning: "orange" as const, danger: "red" as const }
   return (
     <div className={`glass-card border-t-[3px] ${styles[status]} rounded-xl ${className} text-center`}>
       <div className="text-3xl font-bold text-card-foreground mb-1">{count}</div>

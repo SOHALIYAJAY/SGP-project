@@ -175,7 +175,7 @@ export default function RiskAssessmentPage() {
                 <div className="w-36 h-36 rounded-full border-8 border-secondary flex items-center justify-center">
                   <div className="text-center">
                     <div className="text-4xl font-bold text-warning">
-                      <AnimatedCounter end={overallRiskScore} />
+                      {overallRiskScore}
                     </div>
                     <p className="text-sm text-muted-foreground">Risk Score</p>
                   </div>
@@ -233,6 +233,15 @@ export default function RiskAssessmentPage() {
                     angle={30}
                     domain={[0, 100]}
                     tick={{ fill: "var(--muted-foreground)", fontSize: 9 }}
+                  />
+                  <Tooltip
+                    contentStyle={{
+                      backgroundColor: "var(--card)",
+                      border: "1px solid var(--border)",
+                      borderRadius: "8px",
+                      backdropFilter: "blur(8px)",
+                    }}
+                    labelStyle={{ color: "var(--card-foreground)" }}
                   />
                   <Radar
                     name="Risk"
@@ -462,7 +471,7 @@ function RiskCategoryCard({
   return (
     <div
       className={`glass-card border-t-[3px] ${style.border} rounded-xl p-6 card-hover opacity-0 animate-fade-in-up`}
-      style={{ animationDelay: `${delay}ms` }}
+      style={{ animationDelay: `${delay}ms` } as React.CSSProperties}
     >
       <div className="flex items-center justify-between mb-4">
         <div className="flex items-center gap-3">
@@ -523,12 +532,12 @@ function SustainabilityCard({
   return (
     <div
       className="glass-card rounded-xl p-6 card-hover opacity-0 animate-fade-in-up"
-      style={{ animationDelay: `${delay}ms` }}
+      style={{ animationDelay: `${delay}ms` } as React.CSSProperties}
     >
       <h4 className="font-medium text-card-foreground mb-4">{name}</h4>
       <div className="flex items-end justify-between">
         <div className="text-3xl font-bold gradient-text">
-          <AnimatedCounter end={score} suffix="%" />
+          {score}%
         </div>
         <span className={`flex items-center gap-1 text-sm ${trendStyle.text}`}>
           <Icon className="w-4 h-4" />

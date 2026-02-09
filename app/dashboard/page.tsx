@@ -4,6 +4,9 @@ import React from "react"
 import { MetricCard } from "@/components/ui/metric-card"
 import { SectionWrapper } from "@/components/ui/section-wrapper"
 import { useExportPDF } from "@/hooks/use-export-pdf"
+import { GlowCard } from "@/components/ui/spotlight-card";
+import { DashboardGlowCard } from "@/components/ui/dashboard-glow-card";
+
 import {
   Activity,
   AlertTriangle,
@@ -136,18 +139,6 @@ export default function DashboardPage() {
             <Download className="w-5 h-5" />
           </button>
         </div>
-        {/* Example: SGP Status Card */}
-        <div className="mb-6">
-          <SGPStatusCard
-            id="sgp-sample"
-            title="Prediction Confidence"
-            description="Model confidence for growth predictions"
-            status="warning"
-            progress={72}
-            progressLabel="Model Accuracy"
-            progressValue="72%"
-          />
-        </div>
 
         {/* Main Content Container for PDF Export */}
         <div id="dashboard-content">
@@ -198,7 +189,7 @@ export default function DashboardPage() {
         {/* Main Charts Row */}
         <div className="grid lg:grid-cols-3 gap-6 mb-8">
           {/* Revenue vs Cost Chart */}
-          <div className="lg:col-span-2 glass-card rounded-xl p-6 opacity-0 animate-fade-in-up stagger-5 glow-cyan relative group">
+          <div className="lg:col-span-2 glass-card rounded-xl p-6 opacity-0 animate-fade-in-up stagger-5 relative group">
             <div className="flex items-start justify-between gap-4 mb-2">
               <h3 className="text-lg font-semibold text-card-foreground">
                 Revenue vs Cost Analysis
@@ -284,7 +275,7 @@ export default function DashboardPage() {
           </div>
 
           {/* Customer Stability Donut */}
-          <div className="glass-card rounded-xl p-6 opacity-0 animate-fade-in-up stagger-6 glow-amber relative group">
+          <div className="glass-card rounded-xl p-6 opacity-0 animate-fade-in-up stagger-6 relative group">
             <div className="flex items-start justify-between gap-4 mb-2">
               <h3 className="text-lg font-semibold text-card-foreground">
                 Customer Stability
@@ -343,11 +334,12 @@ export default function DashboardPage() {
             </div>
           </div>
         </div>
+        
 
         {/* Secondary Charts Row */}
         <div className="grid lg:grid-cols-2 gap-6 mb-8">
           {/* MRR Growth Chart */}
-          <div className="glass-card rounded-xl p-6 opacity-0 animate-fade-in-up stagger-5 glow-cyan relative group">
+          <div className="glass-card rounded-xl p-6 opacity-0 animate-fade-in-up stagger-5 relative group">
             <div className="flex items-start justify-between gap-4 mb-2">
               <h3 className="text-lg font-semibold text-card-foreground">
                 MRR & ARR Growth
@@ -398,47 +390,58 @@ export default function DashboardPage() {
           </div>
 
           {/* Performance Radial Chart */}
-          <div className="relative glass-card rounded-xl p-6 opacity-0 animate-fade-in-up stagger-6 glow-green" style={{ "--spark-color": "#22C55E" } as React.CSSProperties}>
-            <div className="mb-6">
-              <h3 className="text-lg font-semibold text-card-foreground">
-                Performance Metrics
-              </h3>
-              <p className="text-sm text-muted-foreground">
-                Key business performance indicators
-              </p>
-            </div>
-            <div className="h-64">
-              <ResponsiveContainer width="100%" height="100%">
-                <RadialBarChart
-                  cx="50%"
-                  cy="50%"
-                  innerRadius="30%"
-                  outerRadius="90%"
-                  data={performanceMetrics}
-                  startAngle={90}
-                  endAngle={-270}
-                >
-                  <RadialBar
-                    background={{ fill: "#1E293B" }}
-                    dataKey="value"
-                    cornerRadius={4}
-                  />
-                </RadialBarChart>
-              </ResponsiveContainer>
-            </div>
-            <div className="grid grid-cols-2 gap-3 mt-2">
-              {performanceMetrics.map((metric) => (
-                <div key={metric.name} className="flex items-center gap-2">
-                  <div className="w-3 h-3 rounded-full" style={{ backgroundColor: metric.fill }} />
-                  <span className="text-sm text-muted-foreground">{metric.name}</span>
-                  <span className="text-sm font-medium text-card-foreground ml-auto">{metric.value}%</span>
-                </div>
-              ))}
-            </div>
-          </div>
+<div className="relative glass-card rounded-xl p-6 opacity-0 animate-fade-in-up stagger-6">
+  <div className="mb-6">
+    <h3 className="text-lg font-semibold text-card-foreground">
+      Performance Metrics
+    </h3>
+    <p className="text-sm text-muted-foreground">
+      Key business performance indicators
+    </p>
+  </div>
+
+  <div className="h-64">
+    <ResponsiveContainer width="100%" height="100%">
+      <RadialBarChart
+        cx="50%"
+        cy="50%"
+        innerRadius="30%"
+        outerRadius="90%"
+        data={performanceMetrics}
+        startAngle={90}
+        endAngle={-270}
+      >
+        <RadialBar
+          background={{ fill: "#1E293B" }}
+          dataKey="value"
+          cornerRadius={4}
+        />
+      </RadialBarChart>
+    </ResponsiveContainer>
+  </div>
+
+  <div className="grid grid-cols-2 gap-3 mt-2">
+    {performanceMetrics.map((metric) => (
+      <div key={metric.name} className="flex items-center gap-2">
+        <div
+          className="w-3 h-3 rounded-full"
+          style={{ backgroundColor: metric.fill }}
+        />
+        <span className="text-sm text-muted-foreground">
+          {metric.name}
+        </span>
+        <span className="text-sm font-medium text-card-foreground ml-auto">
+          {metric.value}%
+        </span>
+      </div>
+    ))}
+  </div>
+</div>
+         {/* ✅ CLOSE Secondary Charts Row */}
 
         {/* Risk Distribution Radar Chart */}
-        <div className="relative glass-card rounded-xl p-6 opacity-0 animate-fade-in-up stagger-5 mb-8 glow-orange" style={{ "--spark-color": "#F97316" } as React.CSSProperties}>
+        <div className="relative glass-card rounded-xl p-6 opacity-0 animate-fade-in-up stagger-5 mb-8">
+
           <div className="mb-6">
             <h3 className="text-lg font-semibold text-card-foreground">
               Risk Distribution
@@ -496,13 +499,23 @@ export default function DashboardPage() {
                   dot={{ fill: "#06B6D4", r: 5, strokeWidth: 2, stroke: "#0B1220" }}
                   activeDot={{ r: 7, fill: "#22D3EE" }}
                 />
+                <Tooltip
+                  contentStyle={{
+                    backgroundColor: "rgba(17, 24, 39, 0.95)",
+                    border: "1px solid #1E293B",
+                    borderRadius: "8px",
+                    backdropFilter: "blur(8px)",
+                  }}
+                  labelStyle={{ color: "#F1F5F9" }}
+                  formatter={(value: number) => [`Risk Level: ${value}`, ""]}
+                />
               </RadarChart>
             </ResponsiveContainer>
           </div>
           <div className="grid grid-cols-5 gap-4 mt-6 pt-6 border-t border-border">
             {riskDistributionData.map((item) => (
               <div key={item.name} className="flex flex-col items-center gap-2">
-                <div className="flex items-center justify-center w-10 h-10 rounded-lg bg-secondary/50">
+                <div className="flex items-center justify-center w-10 h-10 rounded-lg bg-primary/10 hover:bg-primary/20 transition-colors cursor-pointer">
                   <span className="text-sm font-semibold text-primary">{item.value}</span>
                 </div>
                 <p className="text-xs text-muted-foreground text-center">{item.name}</p>
@@ -605,8 +618,8 @@ function InsightCard({
 
   return (
     <div
-      className={`group relative glass-card rounded-xl p-6 opacity-0 animate-fade-in-up ${type === 'strength' ? 'glow-green' : type === 'attention' ? 'glow-amber' : 'glow-red'}`}
-      style={{ animationDelay: `${delay}ms`, "--spark-color": style.spark } as React.CSSProperties}
+      className="group relative glass-card rounded-xl p-6 opacity-0 animate-fade-in-up"
+      style={{ animationDelay: `${delay}ms` }}
     >
       <div className="flex items-start gap-4 mb-4">
         <div className={`p-2 rounded-lg ${style.bg}`}>
@@ -634,3 +647,5 @@ function InsightCard({
     </div>
   )
 }
+
+

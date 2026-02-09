@@ -220,7 +220,7 @@ export default function MarketAnalysisPage() {
           </div>
 
           {/* Market Share */}
-          <div className="glass-card rounded-xl p-6 opacity-0 animate-fade-in-up stagger-5 relative">
+          <div className="glass-card rounded-xl p-6 opacity-0 animate-fade-in-up stagger-5 relative group">
             <div className="absolute top-4 right-4">
               <ChartInsight
                 title="Market Share"
@@ -234,7 +234,7 @@ export default function MarketAnalysisPage() {
                 Market Share
               </h3>
             </div>
-            <div className="h-48">
+            <div className="h-48 transition-transform duration-300 group-hover:scale-105">
               <ResponsiveContainer width="100%" height="100%">
                 <PieChart>
                   <Pie
@@ -268,12 +268,6 @@ export default function MarketAnalysisPage() {
                   <span className="text-card-foreground font-medium ml-auto">{item.value}%</span>
                 </div>
               ))}
-            </div>
-            {/* Insight */}
-            <div className="mt-4 pt-4 border-t border-border/50">
-              <p className="text-xs text-muted-foreground leading-relaxed">
-                <span className="text-warning font-semibold">52.5% fragmented</span> market offers opportunity. You're a small but <span className="text-success font-semibold">fast-growing player</span>.
-              </p>
             </div>
           </div>
 
@@ -400,13 +394,6 @@ export default function MarketAnalysisPage() {
                 </AreaChart>
               </ResponsiveContainer>
             </div>
-            {/* Insight */}
-            <div className="mt-6 pt-4 border-t border-border/50">
-              <p className="text-xs text-muted-foreground leading-relaxed">
-                <span className="text-success font-semibold">Strong upward trajectory</span> projected through 2027. 
-                Your SOM (Serviceable Obtainable Market) is <span className="text-success font-semibold">growing 8x faster</span> than TAM, indicating strong positioning.
-              </p>
-            </div>
           </div>
 
           {/* Industry Comparison */}
@@ -460,13 +447,6 @@ export default function MarketAnalysisPage() {
                 </BarChart>
               </ResponsiveContainer>
             </div>
-            {/* Insight */}
-            <div className="mt-6 pt-4 border-t border-border/50">
-              <p className="text-xs text-muted-foreground leading-relaxed">
-                <span className="text-success font-semibold">Outperforming</span> industry across all metrics. 
-                Your 97% retention and 72 NPS are <span className="text-success font-semibold">12-27% higher</span> than average.
-              </p>
-            </div>
           </div>
         </div>
 
@@ -500,12 +480,6 @@ export default function MarketAnalysisPage() {
                   </div>
                 </div>
               ))}
-            </div>
-            {/* Insight */}
-            <div className="mt-6 pt-4 border-t border-border/50">
-              <p className="text-xs text-muted-foreground leading-relaxed">
-                <span className="text-success font-semibold">Competitors A & B</span> lead the market, but significant <span className="text-warning font-semibold">fragmentation</span> exists.
-              </p>
             </div>
           </div>
 
@@ -543,12 +517,6 @@ export default function MarketAnalysisPage() {
                 );
               })}
             </div>
-            {/* Insight */}
-            <div className="mt-6 pt-4 border-t border-border/50">
-              <p className="text-xs text-muted-foreground leading-relaxed">
-                <span className="text-success font-semibold">You're growing 7x faster</span> than Competitor A and 17x faster than the market average.
-              </p>
-            </div>
           </div>
 
           {/* Satisfaction Edge */}
@@ -584,12 +552,6 @@ export default function MarketAnalysisPage() {
                   </div>
                 );
               })}
-            </div>
-            {/* Insight */}
-            <div className="mt-6 pt-4 border-t border-border/50">
-              <p className="text-xs text-muted-foreground leading-relaxed">
-                <span className="text-success font-semibold">72 NPS is your competitive edge</span> — 7 points above nearest competitor, 17+ above laggards.
-              </p>
             </div>
           </div>
         </div>

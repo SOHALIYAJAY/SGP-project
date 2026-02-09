@@ -1,15 +1,17 @@
 "use client"
 
-import React from "react"
+import React, { useState } from "react"
 import { SectionWrapper } from "@/components/ui/section-wrapper"
 import { AnimatedCounter } from "@/components/ui/animated-counter"
 import { useExportPDF } from "@/hooks/use-export-pdf"
+
 import {
   TrendingUp,
   Target,
   DollarSign,
   Users,
   Download,
+  Plus,
 } from "lucide-react"
 import {
   LineChart,
@@ -60,7 +62,6 @@ const predictions = [
     metrics: [
       { label: "Revenue", value: "$9.2M", change: 23, positive: true },
       { label: "Customers", value: "1,950", change: 30, positive: true },
-      { label: "Market Share", value: "3.2%", change: 0.7, positive: true },
     ],
     status: "success" as const,
   },
@@ -70,7 +71,6 @@ const predictions = [
     metrics: [
       { label: "Revenue", value: "$11.8M", change: 57, positive: true },
       { label: "Customers", value: "2,530", change: 69, positive: true },
-      { label: "Market Share", value: "4.1%", change: 1.6, positive: true },
     ],
     status: "success" as const,
   },
@@ -80,7 +80,6 @@ const predictions = [
     metrics: [
       { label: "Revenue", value: "$16.4M", change: 119, positive: true },
       { label: "Customers", value: "3,450", change: 130, positive: true },
-      { label: "Market Share", value: "5.5%", change: 3, positive: true },
     ],
     status: "warning" as const,
   },
@@ -90,7 +89,6 @@ const predictions = [
     metrics: [
       { label: "Revenue", value: "$28.2M", change: 276, positive: true },
       { label: "Customers", value: "5,800", change: 287, positive: true },
-      { label: "Market Share", value: "8.2%", change: 5.7, positive: true },
     ],
     status: "warning" as const,
   },
@@ -186,11 +184,14 @@ export default function PredictionsPage() {
         {/* Main Charts Row */}
         <div className="grid lg:grid-cols-3 gap-6 mb-8">
           {/* Growth Trajectory Chart */}
-          <div className="lg:col-span-2 glass-card rounded-xl p-6 opacity-0 animate-fade-in-up stagger-5 glow-green relative">
-            <div className="mb-6">
+          <div className="lg:col-span-2 glass-card rounded-xl p-6 opacity-0 animate-fade-in-up stagger-5 relative">
+            <div className="flex items-start justify-between gap-4 mb-6">
               <h3 className="text-lg font-semibold text-card-foreground">
                 Growth Trajectory
               </h3>
+              <button className="p-1.5 rounded-lg bg-secondary/40 hover:bg-secondary/60 text-muted-foreground hover:text-foreground transition-colors">
+                <Plus className="w-4 h-4" />
+              </button>
             </div>
             <div className="h-80">
               <ResponsiveContainer width="100%" height="100%">
@@ -246,7 +247,7 @@ export default function PredictionsPage() {
           </div>
 
           {/* Growth Factors - Horizontal Bars */}
-          <div className="glass-card rounded-xl p-6 opacity-0 animate-fade-in-up stagger-6 glow-purple relative">
+          <div className="glass-card rounded-xl p-6 opacity-0 animate-fade-in-up stagger-6 relative">
             <div className="flex items-start justify-between gap-4 mb-6">
               <h3 className="text-lg font-semibold text-card-foreground">
                 Growth Factors
@@ -279,11 +280,14 @@ export default function PredictionsPage() {
         </div>
 
         {/* Scenario Analysis */}
-        <div className="glass-card rounded-xl p-6 mb-8 opacity-0 animate-fade-in-up stagger-5 glow-amber relative">
+        <div className="glass-card rounded-xl p-6 mb-8 opacity-0 animate-fade-in-up stagger-5 relative">
           <div className="flex items-start justify-between gap-4 mb-6">
             <h3 className="text-lg font-semibold text-card-foreground">
               Scenario Analysis
             </h3>
+            <button className="p-1.5 rounded-lg bg-secondary/40 hover:bg-secondary/60 text-muted-foreground hover:text-foreground transition-colors">
+              <Plus className="w-4 h-4" />
+            </button>
           </div>
           <div className="h-72">
             <ResponsiveContainer width="100%" height="100%">
@@ -419,10 +423,13 @@ function SummaryCard({
 
   const style = colorStyles[color]
 
+  const [hasAnimated, setHasAnimated] = useState(false);
+
   return (
     <div
-      className={`relative glass-card rounded-xl p-6 opacity-0 animate-fade-in-up card-hover-spark ${style.sparkClass} ${style.glow}`}
+      className="relative glass-card rounded-xl p-6 opacity-0 animate-fade-in-up overflow-visible"
       style={{ animationDelay: `${delay}ms` }}
+      onAnimationEnd={() => setHasAnimated(true)}
     >
       <div className="flex items-start justify-between mb-4">
         <span className="text-sm text-muted-foreground">{label}</span>
@@ -431,7 +438,11 @@ function SummaryCard({
         </div>
       </div>
       <div className="text-3xl font-bold text-card-foreground mb-2">
-        <AnimatedCounter end={value} prefix={prefix} suffix={suffix} decimals={value % 1 !== 0 ? 1 : 0} />
+        {hasAnimated ? (
+          <span>{prefix}{value}{suffix}</span>
+        ) : (
+          <AnimatedCounter end={value} prefix={prefix} suffix={suffix} decimals={value % 1 !== 0 ? 1 : 0} />
+        )}
       </div>
       <p className="text-xs text-muted-foreground/80 leading-relaxed">
         {helpTexts[label] || "Key metric for prediction analysis"}
@@ -485,8 +496,8 @@ function PredictionCard({
 
   return (
     <div
-      className={`group relative glass-card rounded-xl p-6 opacity-0 animate-fade-in-up ${status === 'success' ? 'glow-green' : status === 'warning' ? 'glow-amber' : 'glow-red'}`}
-      style={{ animationDelay: `${delay}ms`, "--spark-color": sparklineColor[status] } as React.CSSProperties}
+      className="group relative glass-card rounded-xl p-6 opacity-0 animate-fade-in-up overflow-visible h-full flex flex-col"
+      style={{ animationDelay: `${delay}ms` } as React.CSSProperties}
     >
       <div className="flex items-start justify-between mb-4">
         <span className="font-semibold text-card-foreground">{period}</span>

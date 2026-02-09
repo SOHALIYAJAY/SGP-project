@@ -228,14 +228,6 @@ export default function CustomerAnalyticsPage() {
                 </ComposedChart>
               </ResponsiveContainer>
             </div>
-            {/* Insights */}
-            <div className="mt-6 pt-6 border-t border-border/50">
-              <div className="grid sm:grid-cols-3 gap-4">
-                <InsightBullet color="success" text="Retention rate improved to 97% - strong trend" />
-                <InsightBullet color="destructive" text="Churn dropped to 3% - best performance" />
-                <InsightBullet color="primary" text="310 new customers in Aug - accelerating growth" />
-              </div>
-            </div>
           </div>
 
           {/* Customer Lifecycle */}
@@ -291,13 +283,6 @@ export default function CustomerAnalyticsPage() {
                   </span>
                 </div>
               ))}
-            </div>
-            {/* Insights */}
-            <div className="mt-4 pt-4 border-t border-border/50">
-              <div className="space-y-2">
-                <InsightBullet color="success" text="45% active - healthy user base" />
-                <InsightBullet color="warning" text="18% at risk - targeted retention needed" />
-              </div>
             </div>
           </div>
         </div>
@@ -355,14 +340,6 @@ export default function CustomerAnalyticsPage() {
                   <Bar dataKey="benchmark" name="Benchmark" fill="#1E293B" radius={[0, 4, 4, 0]} />
                 </BarChart>
               </ResponsiveContainer>
-            </div>
-            {/* Insights */}
-            <div className="mt-6 pt-6 border-t border-border/50">
-              <div className="grid sm:grid-cols-3 gap-4">
-                <InsightBullet color="primary" text="Ease of Use leads at 4.7 - above benchmark" />
-                <InsightBullet color="success" text="All categories exceed industry average" />
-                <InsightBullet color="warning" text="Value for Money lowest at 3.9 - review pricing" />
-              </div>
             </div>
           </div>
 
@@ -453,13 +430,6 @@ export default function CustomerAnalyticsPage() {
                 </AreaChart>
               </ResponsiveContainer>
             </div>
-            <div className="mt-6 pt-6 border-t border-border/50">
-              <div className="grid sm:grid-cols-3 gap-4">
-                <InsightBullet color="success" text="DAU growing 59% from W1 to W8 - strong engagement" />
-                <InsightBullet color="primary" text="MAU reached 5.9K - consistent monthly growth" />
-                <InsightBullet color="success" text="DAU/MAU ratio improving - higher frequency" />
-              </div>
-            </div>
           </div>
         </div>
 
@@ -509,14 +479,6 @@ export default function CustomerAnalyticsPage() {
                 ))}
               </tbody>
             </table>
-          </div>
-          {/* Insights */}
-          <div className="mt-6 pt-6 border-t border-border/50">
-            <div className="grid sm:grid-cols-3 gap-4">
-              <InsightBullet color="success" text="May 2025 cohort strongest - 97% month 1 retention" />
-              <InsightBullet color="primary" text="6-month retention range 73-76% - consistent" />
-              <InsightBullet color="success" text="Newer cohorts improving - better onboarding" />
-            </div>
           </div>
         </div>
 

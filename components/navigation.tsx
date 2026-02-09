@@ -47,7 +47,7 @@ export function Navigation() {
       <aside
         className={cn(
           "fixed left-0 top-0 h-screen z-50 hidden lg:flex flex-col transition-all duration-300 ease-in-out",
-          collapsed ? "w-16" : "w-48"
+          collapsed ? "w-16" : "w-56"
         )}
       >
         {/* Animated background glow */}
@@ -64,9 +64,7 @@ export function Navigation() {
         </div>
 
         {/* Sidebar border with glow effect */}
-        <div className="absolute right-0 top-0 h-full w-px bg-border">
-          <div className="absolute inset-0 bg-gradient-to-b from-primary/50 via-transparent to-accent/50 animate-glow-line" />
-        </div>
+        <div className="absolute right-0 top-0 h-full w-px bg-border/30" />
 
         {/* Content */}
         <div className="relative z-10 flex flex-col h-full">
@@ -251,7 +249,7 @@ export function Navigation() {
       </header>
 
       {/* Spacer for content */}
-      <div className={cn("hidden lg:block transition-all duration-300", collapsed ? "w-20" : "w-64")} />
+      <div className={cn("hidden lg:block transition-all duration-300", collapsed ? "w-16" : "w-56")} />
       <div className="lg:hidden h-16" />
     </>
   )

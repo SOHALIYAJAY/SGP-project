@@ -32,14 +32,21 @@ export default function CompanyInputPage() {
     industry: "",
     foundedYear: "",
     location: "",
+    primaryMarketRegion: "",
+    businessModel: "",
     revenue: "",
     expenses: "",
     profitMargin: "",
     burnRate: "",
+    cashBalance: "",
+    revenueHistory: "",
+    revenueType: "",
     marketSize: "",
     competitorCount: "",
     growthRate: "",
     marketShare: "",
+    customerTypeMix: "",
+    arpu: "",
     teamSize: "",
     customerCount: "",
     churnRate: "",
@@ -49,6 +56,8 @@ export default function CompanyInputPage() {
     operationalCost: "",
     industryGrowthRate: "",
     customerSatisfaction: "",
+    founderExperience: "",
+    regulatoryExposure: "",
   })
 
   const updateFormData = (field: string, value: string) => {
@@ -209,6 +218,26 @@ export default function CompanyInputPage() {
                     className="form-input-premium form-input-cyan"
                   />
                 </div>
+                <div className="space-y-2">
+                  <Label htmlFor="primaryMarketRegion">Primary Market Region</Label>
+                  <Input
+                    id="primaryMarketRegion"
+                    placeholder="e.g., North America, Europe, Asia"
+                    value={formData.primaryMarketRegion}
+                    onChange={(e) => updateFormData("primaryMarketRegion", e.target.value)}
+                    className="form-input-premium form-input-cyan"
+                  />
+                </div>
+                <div className="space-y-2 md:col-span-2">
+                  <Label htmlFor="businessModel">Business Model</Label>
+                  <Input
+                    id="businessModel"
+                    placeholder="e.g., SaaS, Marketplace, E-commerce"
+                    value={formData.businessModel}
+                    onChange={(e) => updateFormData("businessModel", e.target.value)}
+                    className="form-input-premium form-input-cyan"
+                  />
+                </div>
               </div>
             </div>
           )}
@@ -301,6 +330,39 @@ export default function CompanyInputPage() {
                       />
                       <p className="form-field-hint">Total monthly operating expenses</p>
                     </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="cashBalance">Cash Balance ($)</Label>
+                      <Input
+                        id="cashBalance"
+                        placeholder="e.g., 2500000"
+                        type="number"
+                        value={formData.cashBalance}
+                        onChange={(e) => updateFormData("cashBalance", e.target.value)}
+                        className="form-input-premium form-input-green"
+                      />
+                      <p className="form-field-hint">Current cash on hand</p>
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="revenueHistory">Revenue History (last 6-12 months)</Label>
+                      <Input
+                        id="revenueHistory"
+                        placeholder="e.g., 400k, 450k, 500k, 550k, 600k, 650k"
+                        value={formData.revenueHistory}
+                        onChange={(e) => updateFormData("revenueHistory", e.target.value)}
+                        className="form-input-premium form-input-green"
+                      />
+                      <p className="form-field-hint">Comma-separated monthly revenue</p>
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="revenueType">Revenue Type</Label>
+                      <Input
+                        id="revenueType"
+                        placeholder="e.g., Recurring, One-time, Mixed"
+                        value={formData.revenueType}
+                        onChange={(e) => updateFormData("revenueType", e.target.value)}
+                        className="form-input-premium form-input-green"
+                      />
+                    </div>
               </div>
             </div>
           )}
@@ -379,6 +441,28 @@ export default function CompanyInputPage() {
                     onChange={(e) => updateFormData("industryGrowthRate", e.target.value)}
                     className="form-input-premium form-input-purple"
                   />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="customerTypeMix">Customer Type Mix</Label>
+                  <Input
+                    id="customerTypeMix"
+                    placeholder="e.g., 70% B2B, 30% B2C"
+                    value={formData.customerTypeMix}
+                    onChange={(e) => updateFormData("customerTypeMix", e.target.value)}
+                    className="form-input-premium form-input-purple"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="arpu">Average Revenue per Customer ($)</Label>
+                  <Input
+                    id="arpu"
+                    placeholder="e.g., 5000"
+                    type="number"
+                    value={formData.arpu}
+                    onChange={(e) => updateFormData("arpu", e.target.value)}
+                    className="form-input-premium form-input-purple"
+                  />
+                  <p className="form-field-hint">ARPU or ARPA</p>
                 </div>
               </div>
             </div>
@@ -459,6 +543,27 @@ export default function CompanyInputPage() {
                   />
                   <p className="form-field-hint">NPS or CSAT score</p>
                 </div>
+                <div className="space-y-2">
+                  <Label htmlFor="founderExperience">Founder Experience (years)</Label>
+                  <Input
+                    id="founderExperience"
+                    placeholder="e.g., 10"
+                    type="number"
+                    value={formData.founderExperience}
+                    onChange={(e) => updateFormData("founderExperience", e.target.value)}
+                    className="form-input-premium form-input-amber"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="regulatoryExposure">Regulatory Exposure Level</Label>
+                  <Input
+                    id="regulatoryExposure"
+                    placeholder="e.g., Low, Medium, High"
+                    value={formData.regulatoryExposure}
+                    onChange={(e) => updateFormData("regulatoryExposure", e.target.value)}
+                    className="form-input-premium form-input-amber"
+                  />
+                </div>
               </div>
             </div>
           )}
@@ -497,7 +602,9 @@ export default function CompanyInputPage() {
           </div>
         </div>
       </div>
-      <Footer />
+      <div className="mt-24 mb-0">
+        <Footer />
+      </div>
     </div>
   )
 }

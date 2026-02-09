@@ -5,6 +5,9 @@ import React from "react"
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { AnimatedCounter } from "@/components/ui/animated-counter"
+import { Typewriter } from "@/components/ui/typewriter";
+import RainAnimation from "@/components/rain-animation"
+
 import {
   ArrowRight,
   BarChart3,
@@ -23,6 +26,7 @@ export default function HomePage() {
     <div className="min-h-screen">
       {/* Hero Section */}
       <section className="relative pt-24 pb-16 md:pt-32 md:pb-24 overflow-hidden">
+        <RainAnimation />
         {/* Background Effects */}
         <div className="absolute inset-0 bg-gradient-to-b from-primary/5 via-transparent to-transparent" />
         <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-primary/10 rounded-full blur-[128px] animate-pulse" />
@@ -40,10 +44,19 @@ export default function HomePage() {
             </div>
 
             {/* Main Heading */}
-            <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight text-foreground mb-6 opacity-0 animate-fade-in-up stagger-1">
-              Business Analysis &{" "}
-              <span className="bg-gradient-to-r from-[#0EA5E9] via-[#06B6D4] to-[#0EA5E9] bg-clip-text text-transparent">Prediction System</span>
-            </h1>
+            <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold tracking-tight text-foreground mb-6 opacity-0 animate-fade-in-up stagger-1">
+            Business Analysis &{" "}
+            <Typewriter
+              text={[
+                "Prediction System",
+                "Growth Forecasting",
+                "Smart Business Insights",
+                "AI-Driven Decisions",
+              ]}
+              className="font-bold"
+            />
+          </h1>
+
 
             {/* Subheading */}
             <p className="text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto mb-10 opacity-0 animate-fade-in-up stagger-2 text-pretty">
@@ -159,6 +172,82 @@ export default function HomePage() {
           </div>
         </div>
       </section>
+
+      {/* Video Demo Section */}
+      <section className="py-20">
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-12 opacity-0 animate-fade-in-up">
+            <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-4">
+              See BAPS in Action
+            </h2>
+            <p className="text-muted-foreground max-w-2xl mx-auto">
+              Watch how to input your company data and explore powerful analytics features
+            </p>
+          </div>
+
+          <div className="opacity-0 animate-fade-in-up" style={{ animationDelay: "200ms" }}>
+            <div className="relative rounded-2xl overflow-hidden glass-card p-2">
+              <div className="aspect-video bg-secondary/30 rounded-xl overflow-hidden">
+                <iframe 
+                  className="w-full h-full"
+                  src="https://www.youtube.com/embed/dQw4w9WgXcQ"
+                  title="BAPS Demo Video"
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                  allowFullScreen
+                ></iframe>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* How It Works Section */}
+      <section className="py-20">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-16 opacity-0 animate-fade-in-up">
+            <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-4">
+              How It Works
+            </h2>
+            <p className="text-muted-foreground max-w-2xl mx-auto">
+              Get actionable insights in three simple steps
+            </p>
+          </div>
+
+          <div className="grid md:grid-cols-3 gap-8">
+            <div className="text-center opacity-0 animate-fade-in-up" style={{ animationDelay: "100ms" }}>
+              <div className="w-16 h-16 rounded-full bg-gradient-to-br from-primary to-accent flex items-center justify-center mx-auto mb-4 text-2xl font-bold text-primary-foreground">
+                1
+              </div>
+              <h3 className="text-xl font-semibold text-foreground mb-2">Input Your Data</h3>
+              <p className="text-muted-foreground">
+                Enter your company information, financial metrics, and business details through our intuitive form
+              </p>
+            </div>
+
+            <div className="text-center opacity-0 animate-fade-in-up" style={{ animationDelay: "200ms" }}>
+              <div className="w-16 h-16 rounded-full bg-gradient-to-br from-primary to-accent flex items-center justify-center mx-auto mb-4 text-2xl font-bold text-primary-foreground">
+                2
+              </div>
+              <h3 className="text-xl font-semibold text-foreground mb-2">AI Analysis</h3>
+              <p className="text-muted-foreground">
+                Our AI engine processes your data, identifies patterns, and generates comprehensive insights across multiple dimensions
+              </p>
+            </div>
+
+            <div className="text-center opacity-0 animate-fade-in-up" style={{ animationDelay: "300ms" }}>
+              <div className="w-16 h-16 rounded-full bg-gradient-to-br from-primary to-accent flex items-center justify-center mx-auto mb-4 text-2xl font-bold text-primary-foreground">
+                3
+              </div>
+              <h3 className="text-xl font-semibold text-foreground mb-2">Get Insights</h3>
+              <p className="text-muted-foreground">
+                Access detailed reports, predictions, and actionable recommendations to drive your business forward
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <div className="py-12" />
 
       <Footer />
     </div>

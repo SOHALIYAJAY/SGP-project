@@ -3,6 +3,7 @@
 import { SectionWrapper } from "@/components/ui/section-wrapper"
 import { MetricCard } from "@/components/ui/metric-card"
 import { AnimatedCounter } from "@/components/ui/animated-counter"
+
 import {
   DollarSign,
   TrendingUp,
@@ -191,7 +192,7 @@ export default function FinancialAnalysisPage() {
         {/* Charts Section */}
         <div className="grid lg:grid-cols-2 gap-6 mb-12">
           {/* Revenue & Profit Trend */}
-          <div className="glass-card rounded-xl p-6 opacity-0 animate-fade-in-up stagger-5 glow-cyan relative">
+          <div className="glass-card rounded-xl p-6 opacity-0 animate-fade-in-up stagger-5 relative">
             <div className="flex items-start justify-between gap-4 mb-2">
               <h3 className="text-lg font-semibold text-card-foreground">
                 Revenue & Profit
@@ -265,7 +266,7 @@ export default function FinancialAnalysisPage() {
           </div>
           
           {/* Expense Breakdown */}
-          <div className="glass-card rounded-xl p-6 opacity-0 animate-fade-in-up stagger-6 glow-orange relative">
+          <div className="glass-card rounded-xl p-6 opacity-0 animate-fade-in-up stagger-6 relative">
             <div className="flex items-start justify-between gap-4 mb-2">
               <h3 className="text-lg font-semibold text-card-foreground">
                 Expense Breakdown
@@ -311,7 +312,7 @@ export default function FinancialAnalysisPage() {
         </div>
 
         {/* Financial Health Score (with circular gauge) */}
-        <div className="glass-card rounded-xl p-6 mb-12 opacity-0 animate-fade-in-up stagger-6 glow-purple relative">
+        <div className="glass-card rounded-xl p-6 mb-12 opacity-0 animate-fade-in-up stagger-6 relative">
           <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-6">
             <div>
               <h3 className="text-lg font-semibold text-card-foreground mb-2">
@@ -322,21 +323,18 @@ export default function FinancialAnalysisPage() {
               </p>
             </div>
             <div className="flex items-center gap-6">
-              <Gauge score={78} size={112} />
-              <div className="flex items-center gap-4">
-                <div className="text-center">
-                  <div className="text-3xl font-bold text-foreground">
-                    <AnimatedCounter end={78} suffix="/100" />
-                  </div>
-                  <p className="text-sm text-muted-foreground mt-1">Health Score</p>
+              <div className="text-center">
+                <div className="text-3xl font-bold text-foreground">
+                  78/100
                 </div>
-                <div className="h-16 w-px bg-border" />
-                <div className="text-center">
-                  <div className="text-3xl font-bold text-success">
-                    <AnimatedCounter end={4.2} suffix="x" decimals={1} />
-                  </div>
-                  <p className="text-sm text-muted-foreground mt-1">LTV:CAC Ratio</p>
+                <p className="text-sm text-muted-foreground mt-1">Health Score</p>
+              </div>
+              <div className="h-16 w-px bg-border" />
+              <div className="text-center">
+                <div className="text-3xl font-bold text-success">
+                  4.2x
                 </div>
+                <p className="text-sm text-muted-foreground mt-1">LTV:CAC Ratio</p>
               </div>
             </div>
           </div>
@@ -398,7 +396,7 @@ function RiskFlagCard({
   return (
     <div
       className={`glass-card border-l-4 ${style.border} rounded-xl p-6 card-hover opacity-0 animate-fade-in-up`}
-      style={{ animationDelay: `${delay}ms` }}
+      style={{ animationDelay: `${delay}ms` } as React.CSSProperties}
     >
       <div className="flex items-start gap-4">
         <div className={`p-2 rounded-lg ${style.bg}`}>

@@ -1,5 +1,3 @@
-"use client"
-
 import React from "react"
 
 import Link from "next/link"
@@ -7,6 +5,7 @@ import { Button } from "@/components/ui/button"
 import { AnimatedCounter } from "@/components/ui/animated-counter"
 import { Typewriter } from "@/components/ui/typewriter";
 import RainAnimation from "@/components/rain-animation"
+import Footer from "@/components/footer"
 
 import {
   ArrowRight,
@@ -18,12 +17,11 @@ import {
   Zap,
   CheckCircle2,
 } from "lucide-react"
-import Footer from "@/components/footer"
 import HeroParticles from "@/components/hero-particles"
 
 export default function HomePage() {
   return (
-    <div className="min-h-screen">
+    <div>
       {/* Hero Section */}
       <section className="relative pt-24 pb-16 md:pt-32 md:pb-24 overflow-hidden">
         <RainAnimation />
@@ -202,7 +200,7 @@ export default function HomePage() {
       </section>
 
       {/* How It Works Section */}
-      <section className="py-20">
+      <section className="py-20 pb-12">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16 opacity-0 animate-fade-in-up">
             <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-4">
@@ -246,10 +244,10 @@ export default function HomePage() {
           </div>
         </div>
       </section>
-
-      <div className="py-12" />
-
+<br />
+<br /><br /><br /><br />
       <Footer />
+
     </div>
   )
 }
@@ -301,19 +299,60 @@ function FeatureCard({
   delay?: number
 }) {
   const colorMap = {
-    dashboard: { icon: "#0EA5E9", bg: "bg-cyan-500/5", hover: "group-hover:bg-cyan-500/10" },
-    prediction: { icon: "#06B6D4", bg: "bg-teal-500/5", hover: "group-hover:bg-teal-500/10" },
-    ai: { icon: "#A855F7", bg: "bg-purple-500/5", hover: "group-hover:bg-purple-500/10" },
-    risk: { icon: "#F97316", bg: "bg-orange-500/5", hover: "group-hover:bg-orange-500/10" },
-    financial: { icon: "#10B981", bg: "bg-green-500/5", hover: "group-hover:bg-green-500/10" },
-    investment: { icon: "#EC4899", bg: "bg-pink-500/5", hover: "group-hover:bg-pink-500/10" },
-  }
+dashboard: {
+  icon: "#3B82F6",
+  bg: "bg-blue-500/5",
+  hover: "group-hover:bg-blue-500/10",
+  border: "border-t-blue-500",
+  glow: "group-hover:shadow-[0_0_25px_rgba(59,130,246,0.35)]"
+},
+    prediction: {
+  icon: "#6366F1",
+  bg: "bg-indigo-500/5",
+  hover: "group-hover:bg-indigo-500/10",
+  border: "border-t-indigo-500",
+  glow: "group-hover:shadow-[0_0_25px_rgba(99,102,241,0.35)]"
+}
+,
+   ai: {
+  icon: "#D946EF",
+  bg: "bg-fuchsia-500/5",
+  hover: "group-hover:bg-fuchsia-500/10",
+  border: "border-t-fuchsia-500",
+  glow: "group-hover:shadow-[0_0_25px_rgba(217,70,239,0.35)]"
+}
+,
+   risk: {
+  icon: "#F59E0B",
+  bg: "bg-amber-500/5",
+  hover: "group-hover:bg-amber-500/10",
+  border: "border-t-amber-500",
+  glow: "group-hover:shadow-[0_0_25px_rgba(245,158,11,0.35)]"
+}
+,
+   financial: {
+  icon: "#10B981",
+  bg: "bg-emerald-500/5",
+  hover: "group-hover:bg-emerald-500/10",
+  border: "border-t-emerald-500",
+  glow: "group-hover:shadow-[0_0_25px_rgba(16,185,129,0.35)]"
+}
+,
+    investment: {
+  icon: "#06B6D4",
+  bg: "bg-cyan-500/5",
+  hover: "group-hover:bg-cyan-500/10",
+  border: "border-t-cyan-500",
+  glow: "group-hover:shadow-[0_0_25px_rgba(6,182,212,0.35)]"
+}
+
+}
 
   const colorStyle = colorMap[color]
 
   return (
     <div
-      className="p-6 rounded-xl glass-card card-hover opacity-0 animate-fade-in-up group"
+      className={`p-6 rounded-xl glass-card border-t-4 ${colorStyle.border} card-hover opacity-0 animate-fade-in-up group`}
       style={{ animationDelay: `${delay}ms` }}
     >
       <div className={`w-12 h-12 rounded-lg ${colorStyle.bg} flex items-center justify-center mb-4 ${colorStyle.hover} transition-colors`}>

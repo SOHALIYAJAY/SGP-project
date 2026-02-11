@@ -1,11 +1,9 @@
 "use client"
 
-import React from "react"
-
+import React, { useState } from "react"
 import { SectionWrapper } from "@/components/ui/section-wrapper"
 import {
   Lightbulb,
-  ArrowRight,
   Clock,
   Target,
   TrendingUp,
@@ -14,6 +12,11 @@ import {
   Shield,
   Zap,
   CheckCircle2,
+  Download,
+  Filter,
+  ArrowUpDown,
+  Sparkles,
+  TrendingDown,
 } from "lucide-react"
 
 type Priority = "high" | "medium" | "low"
@@ -145,366 +148,317 @@ const priorityGroups = {
 }
 
 export default function RecommendationsPage() {
-  const [lowExpanded, setLowExpanded] = React.useState(false)
+  const [filterPriority, setFilterPriority] = useState<"all" | Priority>("all")
+  const [sortBy, setSortBy] = useState<"impact" | "confidence" | "timeline">("impact")
+
+  const filteredRecs = filterPriority === "all" ? recommendations : recommendations.filter(r => r.priority === filterPriority)
+  
+  const sortedRecs = [...filteredRecs].sort((a, b) => {
+    if (sortBy === "impact") {
+      const aScore = parseImpactScore(a.impact)
+      const bScore = parseImpactScore(b.impact)
+      return bScore - aScore
+    }
+    if (sortBy === "confidence") {
+      return computeConfidence(b) - computeConfidence(a)
+    }
+    return parseTimelineMonths(a.timeline) - parseTimelineMonths(b.timeline)
+  })
+
+  const highPriority = sortedRecs.filter(r => r.priority === "high")
+  const mediumPriority = sortedRecs.filter(r => r.priority === "medium")
+  const lowPriority = sortedRecs.filter(r => r.priority === "low")
+
+  const totalROI = "$2.4M"
+  const avgConfidence = Math.round(sortedRecs.reduce((sum, r) => sum + computeConfidence(r), 0) / sortedRecs.length)
 
   return (
-    <div className="min-h-screen pt-20">
+    <div className="min-h-screen py-2">
       <SectionWrapper>
         {/* Header */}
         <div className="mb-8 opacity-0 animate-fade-in-up">
-          <h1 className="text-3xl md:text-4xl font-bold text-foreground mb-2">AI Recommendations</h1>
-          <p className="text-muted-foreground">Actionable insights prioritized by impact and urgency</p>
-        </div>
-
-        {/* Summary Row - compact horizontal */}
-        <div className="flex items-center gap-4 mb-6 opacity-0 animate-fade-in-up" style={{ animationDelay: `80ms` }}>
-          <div className="flex-1">
-            <SummaryCard count={priorityGroups.high.length} label="High" status="danger" className="p-3" />
-          </div>
-          <div className="flex-1">
-            <SummaryCard count={priorityGroups.medium.length} label="Medium" status="warning" className="p-3" />
-          </div>
-          <div className="flex-1">
-            <SummaryCard count={priorityGroups.low.length} label="Low" status="success" className="p-3" />
-          </div>
-        </div>
-
-        {/* High Priority - full-width, dominant */}
-        <div className="mb-8 opacity-0 animate-fade-in-up" style={{ animationDelay: `120ms` }}>
-          <PrioritySection
-            title="High Priority"
-            subtitle="Address these items immediately for maximum impact"
-            recommendations={priorityGroups.high}
-            priority="high"
-            delay={200}
-            columnsClass="grid-cols-1"
-          />
-        </div>
-
-        {/* Medium Priority - grid 2-3 columns */}
-        <div className="mb-8 opacity-0 animate-fade-in-up" style={{ animationDelay: `160ms` }}>
-          <PrioritySection
-            title="Medium Priority"
-            subtitle="Plan these initiatives for the next quarter"
-            recommendations={priorityGroups.medium}
-            priority="medium"
-            delay={400}
-            columnsClass="md:grid-cols-2 lg:grid-cols-3"
-          />
-        </div>
-
-        {/* Low Priority - collapsed/softer */}
-        <div className="opacity-0 animate-fade-in-up" style={{ animationDelay: `200ms` }}>
-          <div className="flex items-center justify-between mb-3">
-            <div className="flex items-center gap-3">
-              <div className="w-3 h-3 rounded-full bg-success" />
-              <h3 className="text-lg font-semibold text-success">Low Priority</h3>
-              <span className="text-xs font-medium px-2 py-1 rounded-full bg-success/10 text-success">{priorityGroups.low.length} items</span>
-            </div>
+          <div className="flex items-start justify-between gap-4 mb-4">
             <div>
-              <button className="text-sm px-3 py-2 rounded-md bg-secondary/10" onClick={() => setLowExpanded((s) => !s)}>
-                {lowExpanded ? "Collapse" : "Expand"}
+              <h1 className="text-3xl md:text-4xl font-bold text-foreground mb-2">AI Insights</h1>
+              <p className="text-muted-foreground">AI-powered strategic recommendations based on your business data</p>
+            </div>
+            <div className="flex items-center gap-3">
+              {/* Filter Dropdown */}
+              <div className="relative">
+                <select 
+                  value={filterPriority}
+                  onChange={(e) => setFilterPriority(e.target.value as "all" | Priority)}
+                  className="glass-card rounded-lg px-4 py-2 pr-10 text-sm text-card-foreground border border-white/10 appearance-none cursor-pointer"
+                >
+                  <option value="all">All Priorities</option>
+                  <option value="high">High Priority</option>
+                  <option value="medium">Medium Priority</option>
+                  <option value="low">Low Priority</option>
+                </select>
+                <Filter className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground pointer-events-none" />
+              </div>
+
+              {/* Sort Dropdown */}
+              <div className="relative">
+                <select
+                  value={sortBy}
+                  onChange={(e) => setSortBy(e.target.value as "impact" | "confidence" | "timeline")}
+                  className="glass-card rounded-lg px-4 py-2 pr-10 text-sm text-card-foreground border border-white/10 appearance-none cursor-pointer"
+                >
+                  <option value="impact">Sort by Impact</option>
+                  <option value="confidence">Sort by Confidence</option>
+                  <option value="timeline">Sort by Timeline</option>
+                </select>
+                <ArrowUpDown className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground pointer-events-none" />
+              </div>
+
+              {/* Export Button */}
+              <button className="glass-card rounded-lg px-4 py-2 text-sm text-card-foreground border border-white/10 hover:border-primary/30 transition-colors flex items-center gap-2">
+                <Download className="w-4 h-4" />
+                Export
               </button>
             </div>
           </div>
-
-          <div className={`${lowExpanded ? "" : "opacity-60"} grid md:grid-cols-2 lg:grid-cols-3 gap-6`}>
-            {priorityGroups.low.map((rec, idx) => (
-              <RecommendationCard key={rec.id} recommendation={rec} delay={600 + idx * 30} />
-            ))}
-          </div>
         </div>
+
+        {/* Summary Metrics Row */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+          <SummaryMetricCard
+            icon={Sparkles}
+            label="Total Insights"
+            value={sortedRecs.length.toString()}
+            iconColor="text-primary"
+            delay={100}
+          />
+          <SummaryMetricCard
+            icon={TrendingUp}
+            label="High Priority"
+            value={highPriority.length.toString()}
+            iconColor="text-destructive"
+            delay={200}
+          />
+          <SummaryMetricCard
+            icon={DollarSign}
+            label="Estimated ROI"
+            value={totalROI}
+            iconColor="text-success"
+            delay={300}
+          />
+          <SummaryMetricCard
+            icon={Target}
+            label="Avg Confidence"
+            value={`${avgConfidence}%`}
+            iconColor="text-warning"
+            delay={400}
+          />
+        </div>
+
+        {/* High Priority Section */}
+        {highPriority.length > 0 && (
+          <div className="mb-8 opacity-0 animate-fade-in-up" style={{ animationDelay: "500ms" }}>
+            <div className="flex items-center gap-3 mb-6">
+              <div className="w-1 h-6 bg-destructive rounded-full" />
+              <h2 className="text-xl font-semibold text-destructive">High Priority</h2>
+              <span className="text-xs font-medium px-2 py-1 rounded-full bg-destructive/10 text-destructive">
+                {highPriority.length} {highPriority.length === 1 ? "insight" : "insights"}
+              </span>
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {highPriority.map((rec, idx) => (
+                <InsightCard key={rec.id} recommendation={rec} delay={600 + idx * 100} />
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* Medium Priority Section */}
+        {mediumPriority.length > 0 && (
+          <div className="mb-8 opacity-0 animate-fade-in-up" style={{ animationDelay: "600ms" }}>
+            <div className="flex items-center gap-3 mb-6">
+              <div className="w-1 h-6 bg-warning rounded-full" />
+              <h2 className="text-xl font-semibold text-warning">Medium Priority</h2>
+              <span className="text-xs font-medium px-2 py-1 rounded-full bg-warning/10 text-warning">
+                {mediumPriority.length} {mediumPriority.length === 1 ? "insight" : "insights"}
+              </span>
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {mediumPriority.map((rec, idx) => (
+                <InsightCard key={rec.id} recommendation={rec} delay={700 + idx * 100} />
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* Low Priority Section */}
+        {lowPriority.length > 0 && (
+          <div className="opacity-0 animate-fade-in-up" style={{ animationDelay: "700ms" }}>
+            <div className="flex items-center gap-3 mb-6">
+              <div className="w-1 h-6 bg-success rounded-full" />
+              <h2 className="text-xl font-semibold text-success">Low Priority</h2>
+              <span className="text-xs font-medium px-2 py-1 rounded-full bg-success/10 text-success">
+                {lowPriority.length} {lowPriority.length === 1 ? "insight" : "insights"}
+              </span>
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {lowPriority.map((rec, idx) => (
+                <InsightCard key={rec.id} recommendation={rec} delay={800 + idx * 100} />
+              ))}
+            </div>
+          </div>
+        )}
       </SectionWrapper>
     </div>
   )
 }
 
-function AIConfidenceCard() {
-  const overall = { high: 0.92, medium: 0.76, low: 0.63 }
-
-  return (
-    <div className="glass-card rounded-xl p-6">
-      <h5 className="text-sm font-semibold text-card-foreground mb-2">AI Confidence</h5>
-      <p className="text-xs text-muted-foreground mb-4">Model confidence in recommended priorities and expected outcomes.</p>
-
-      <div className="space-y-3">
-        {([
-          { key: "high", label: "High Priority", val: overall.high, color: "destructive" },
-          { key: "medium", label: "Medium Priority", val: overall.medium, color: "warning" },
-          { key: "low", label: "Low Priority", val: overall.low, color: "success" },
-        ] as const).map((row) => (
-          <div key={row.key} className="space-y-1">
-            <div className="flex items-center justify-between text-xs">
-              <span className="text-muted-foreground">{row.label}</span>
-              <span className={`text-xs font-semibold text-${row.color}`}>{Math.round(row.val * 100)}%</span>
-            </div>
-            <div className="h-2 bg-secondary rounded-full overflow-hidden">
-              <div className={`h-full rounded-full ${row.color === "destructive" ? "bg-destructive" : row.color === "warning" ? "bg-warning" : "bg-success"}`} style={{ width: `${Math.round(row.val * 100)}%` }} />
-            </div>
-          </div>
-        ))}
-      </div>
-    </div>
-  )
+// Helper functions
+const computeConfidence = (rec: Recommendation) => {
+  const base = rec.priority === "high" ? 90 : rec.priority === "medium" ? 75 : 60
+  const effortAdj = rec.effort === "High" ? -8 : rec.effort === "Medium" ? 0 : 4
+  return Math.max(35, Math.min(99, base + effortAdj))
 }
 
-function SummaryCard({ count, label, status, className = "" }: { count: number; label: string; status: "success" | "warning" | "danger"; className?: string }) {
-  const styles = { success: "border-t-success", warning: "border-t-warning", danger: "border-t-destructive" }
-  const glowColors = { success: "green" as const, warning: "orange" as const, danger: "red" as const }
-  return (
-    <div className={`glass-card border-t-[3px] ${styles[status]} rounded-xl ${className} text-center`}>
-      <div className="text-3xl font-bold text-card-foreground mb-1">{count}</div>
-      <div className="text-sm text-muted-foreground">{label}</div>
-    </div>
-  )
-}
-
-function PrioritySection({ title, subtitle, recommendations, priority, delay = 0, columnsClass = "md:grid-cols-2 lg:grid-cols-3" }: { title: string; subtitle: string; recommendations: Recommendation[]; priority: Priority; delay?: number; columnsClass?: string }) {
-  const priorityStyles = {
-    high: { badge: "bg-destructive/10 text-destructive", dot: "bg-destructive", text: "text-destructive", accent: "destructive" },
-    medium: { badge: "bg-warning/10 text-warning", dot: "bg-warning", text: "text-warning", accent: "warning" },
-    low: { badge: "bg-success/10 text-success", dot: "bg-success", text: "text-success", accent: "success" },
+const parseImpactScore = (impactText: string) => {
+  const numMatch = impactText.match(/(-?\d+\.?\d*)\s*%?/)
+  if (numMatch) {
+    const n = Math.abs(Number(numMatch[1]))
+    if (!isNaN(n)) return Math.min(100, Math.round(n))
   }
+  return 50
+}
 
-  const style = priorityStyles[priority as keyof typeof priorityStyles]
+const parseTimelineMonths = (timeline: string) => {
+  const m = timeline.match(/(\d+(?:\.\d+)?)(?:\s*-\s*(\d+(?:\.\d+)?))?\s*(month|months|mo|m|year|years|yr)?/i)
+  if (m) {
+    const a = Number(m[1])
+    const b = m[2] ? Number(m[2]) : a
+    let avg = (a + b) / 2
+    const unit = (m[3] || "").toLowerCase()
+    if (unit.startsWith("year") || unit.startsWith("yr")) avg = avg * 12
+    return Math.max(0.5, Math.round(avg))
+  }
+  return 6
+}
 
+// Summary Metric Card Component
+function SummaryMetricCard({
+  icon: Icon,
+  label,
+  value,
+  iconColor,
+  delay = 0,
+}: {
+  icon: React.ElementType
+  label: string
+  value: string
+  iconColor: string
+  delay?: number
+}) {
   return (
-    <div className="mb-12 opacity-0 animate-fade-in-up" style={{ animationDelay: `${delay}ms` }}>
-      <div className="flex items-center gap-3 mb-2">
-        <div className={`w-3 h-3 rounded-full ${style.dot}`} />
-        <span className="ai-pulse" aria-hidden />
-        <h3 className={`text-xl font-semibold ${style.text}`}>{title}</h3>
-        <span className={`text-xs font-medium px-2 py-1 rounded-full ${style.badge}`}>{recommendations.length} items</span>
-      </div>
-      <p className="text-muted-foreground mb-6 ml-6">{subtitle}</p>
-
-      <div className={`grid ${columnsClass} gap-6`}>
-        {recommendations.map((rec, index) => (
-          <RecommendationCard key={rec.id} recommendation={rec} delay={delay + 100 + index * 50} />
-        ))}
+    <div
+      className="glass-card rounded-xl p-6 border border-white/10 opacity-0 animate-fade-in-up"
+      style={{ animationDelay: `${delay}ms` }}
+    >
+      <div className="flex items-start justify-between mb-4">
+        <div className="flex-1">
+          <p className="text-sm text-muted-foreground mb-2">{label}</p>
+          <p className="text-3xl font-bold text-foreground">{value}</p>
+        </div>
+        <div className={`p-2 rounded-lg bg-secondary/30`}>
+          <Icon className={`w-5 h-5 ${iconColor}`} />
+        </div>
       </div>
     </div>
   )
 }
 
-function RecommendationCard({ recommendation, delay = 0 }: { recommendation: Recommendation; delay?: number }) {
+// Insight Card Component
+function InsightCard({ recommendation, delay = 0 }: { recommendation: Recommendation; delay?: number }) {
   const Icon = recommendation.icon
-  const priorityMap = {
-    high: { text: "text-destructive", bg: "bg-destructive/10", bar: "bg-destructive", accent: "destructive" },
-    medium: { text: "text-warning", bg: "bg-warning/10", bar: "bg-warning", accent: "warning" },
-    low: { text: "text-success", bg: "bg-success/10", bar: "bg-success", accent: "success" },
-  } as const
+  const [inProgress, setInProgress] = useState(false)
+  const [completed, setCompleted] = useState(false)
 
-  const p = priorityMap[recommendation.priority]
-
-  const computeConfidence = (rec: Recommendation) => {
-    const base = rec.priority === "high" ? 0.9 : rec.priority === "medium" ? 0.75 : 0.6
-    const effortAdj = rec.effort === "High" ? -0.08 : rec.effort === "Medium" ? 0 : 0.04
-    const val = Math.max(0.35, Math.min(0.99, base + effortAdj))
-    return Math.round(val * 100)
+  const priorityStyles = {
+    high: { border: "border-destructive/30", badge: "bg-destructive/10 text-destructive", icon: "text-destructive", progress: "bg-destructive" },
+    medium: { border: "border-warning/30", badge: "bg-warning/10 text-warning", icon: "text-warning", progress: "bg-warning" },
+    low: { border: "border-success/30", badge: "bg-success/10 text-success", icon: "text-success", progress: "bg-success" },
   }
 
+  const style = priorityStyles[recommendation.priority]
   const confidence = computeConfidence(recommendation)
-  const [showWhy, setShowWhy] = React.useState(false)
-  const [inProgress, setInProgress] = React.useState(false)
-  const [deferred, setDeferred] = React.useState(false)
-  const [addedToRoadmap, setAddedToRoadmap] = React.useState(false)
-
-  const factors = [
-    { icon: TrendingUp, label: "Predicted Impact", text: "Model projects high ROI based on growth signals" },
-    { icon: Zap, label: "Operational Fit", text: "Low integration effort; automatable" },
-    { icon: CheckCircle2, label: "Data Support", text: "Multiple data sources indicate supporting trend" },
-  ]
-
-  const getMetricTooltip = (metric: string) => {
-    const map: Record<string, string> = {
-      "Churn Rate": "Measures customer attrition — lower is better",
-      "NPS Score": "Net Promoter Score — customer satisfaction indicator",
-      "Customer LTV": "Lifetime value of a customer — revenue per customer over time",
-      "Revenue Concentration": "Dependence on top customers — risk indicator",
-      "New Customer Acquisition": "Rate of acquiring new customers",
-      "Product Mix": "Diversity of product revenue streams",
-      "Operational Costs": "Costs tied to operations — efficiency metric",
-      "Support Response Time": "Time to resolve customer issues",
-      "Onboarding Time": "Time to onboard new customers",
-      "Market Share": "Share of total market revenue",
-      "Brand Awareness": "Recognition of brand among target users",
-      "Lead Generation": "Rate of new qualified leads",
-      "Investor Pipeline": "Lead indicators of investor interest",
-      "Due Diligence Readiness": "Preparedness for investor review",
-      "Valuation": "Estimated company worth",
-      "Security Score": "Assessment of security posture",
-      "Compliance Status": "Regulatory compliance progress",
-      "Enterprise Win Rate": "Success rate with enterprise deals",
-      "Partner Revenue": "Revenue through partners",
-      "Channel Diversification": "Number of revenue channels",
-      "Market Reach": "Coverage across markets",
-      "Feature Adoption": "User adoption of new features",
-      "Customer Satisfaction": "Overall user satisfaction metrics",
-      "Competitive Edge": "Advantage over competitors",
-    }
-    return map[metric] ?? "Metric supporting the recommendation"
-  }
-
-  const parseImpactScore = (impactText: string) => {
-    const numMatch = impactText.match(/(-?\d+\.?\d*)\s*%?/)
-    if (numMatch) {
-      const n = Math.abs(Number(numMatch[1]))
-      if (!isNaN(n)) return Math.min(100, Math.round(n))
-    }
-    if (recommendation.priority === "high") return 85
-    if (recommendation.priority === "medium") return 55
-    return 30
-  }
-
-  const parseTimelineMonths = (timeline: string) => {
-    const m = timeline.match(/(\d+(?:\.\d+)?)(?:\s*-\s*(\d+(?:\.\d+)?))?\s*(month|months|mo|m|year|years|yr)?/i)
-    if (m) {
-      const a = Number(m[1])
-      const b = m[2] ? Number(m[2]) : a
-      let avg = (a + b) / 2
-      const unit = (m[3] || "").toLowerCase()
-      if (unit.startsWith("year") || unit.startsWith("yr")) avg = avg * 12
-      return Math.max(0.5, Math.round(avg))
-    }
-    return 6
-  }
-
   const impactScore = parseImpactScore(recommendation.impact)
   const timelineMonths = parseTimelineMonths(recommendation.timeline)
-  const timeLabel = timelineMonths >= 12 ? `${Math.round(timelineMonths / 12)} yr` : `${timelineMonths} mo`
 
   return (
-    <div className={`opacity-0 animate-fade-in-up group`} style={{ animationDelay: `${delay}ms` }}>
-      <div className={`rounded-xl p-[1px] bg-gradient-to-r from-${p.accent} to-${p.accent}/60`}>
-        <div className="glass-card rounded-[calc(0.75rem-1px)] p-6 relative group-hover:shadow-xl transition-shadow duration-200 transform-gpu transition-transform will-change-transform group-hover:-translate-y-1" style={{ backdropFilter: "blur(6px)" }}>
-          <div className={`absolute -top-3 left-4 px-2 py-1 text-xs rounded-md font-semibold ${p.bg} ${p.text}`}>{recommendation.priority.toUpperCase()}</div>
-
-          <div className="flex items-start gap-3 mb-4">
-            <div className={`p-2 rounded-lg ${p.bg} group-hover:opacity-90 transition-colors`}>
-              <Icon className={`w-5 h-5 ${p.text}`} />
-            </div>
-            <div className="flex-1">
-              <span className="text-xs text-muted-foreground">{recommendation.category}</span>
-              <div className="flex items-center gap-2">
-                <h4 className="font-bold text-card-foreground text-lg leading-tight">{recommendation.title}</h4>
-                {confidence >= 85 ? (
-                  <span className={`ai-badge ${p.bg} ${p.text}`}>AI Verified</span>
-                ) : confidence >= 75 ? (
-                  <span className={`ai-badge ${p.bg} ${p.text}`}>High Confidence</span>
-                ) : null}
-              </div>
-            </div>
-
-            <div className="ml-4 flex flex-col items-end">
-              <span className="text-xs text-muted-foreground">Confidence</span>
-              <div className="w-12 h-6 flex items-center justify-center text-sm font-semibold">
-                <span className="text-card-foreground">{confidence}%</span>
-              </div>
-            </div>
-          </div>
-
-          <p className="text-sm text-muted-foreground mb-4">{recommendation.description}</p>
-
-          <div className="mb-4">
-            <div className={`inline-flex items-center gap-2 px-3 py-1 rounded-full text-sm font-medium ${p.bg} ${p.text}`}>
-              <Target className={`w-4 h-4 ${p.text}`} />
-              <span>{recommendation.impact}</span>
-            </div>
-          </div>
-
-          <div className="flex flex-wrap gap-2 mb-4">
-            {recommendation.metrics.map((metric) => (
-              <span key={metric} className="text-xs px-2 py-0.5 rounded-full bg-secondary/30 text-muted-foreground metric-tooltip" title={getMetricTooltip(metric)}>
-                {metric}
-              </span>
-            ))}
-          </div>
-
-          <div className="flex items-center gap-3 mb-3">
-            <div className="flex-1">
-              <div className="flex items-center justify-between text-xs text-muted-foreground mb-1">
-                <span>Impact</span>
-                <span className="font-medium text-card-foreground">{impactScore}%</span>
-              </div>
-              <div className="h-2 bg-secondary rounded-full overflow-hidden">
-                <div className={`h-full ${p.bar}`} style={{ width: `${impactScore}%` }} />
-              </div>
-            </div>
-
-            <div className={`inline-flex items-center gap-2 px-2 py-1 rounded-full text-xs font-medium ${p.bg} ${p.text}`}>
-              <Clock className="w-3 h-3" />
-              <span>{timeLabel}</span>
-            </div>
-
-            <div className="inline-flex items-center gap-2 px-2 py-1 rounded-full text-xs font-medium bg-secondary/10 text-card-foreground">
-              <span className="font-semibold">{confidence}%</span>
-            </div>
-          </div>
-
-          <div className="mb-3">
-            <button type="button" onClick={() => setShowWhy((s) => !s)} className="flex items-center gap-2 text-sm text-muted-foreground" aria-expanded={showWhy}>
-              <Lightbulb className="w-4 h-4 text-muted-foreground" />
-              <span>Why AI recommends this</span>
-              <ArrowRight className={`w-3 h-3 transform transition-transform ${showWhy ? "rotate-90" : ""}`} />
-            </button>
-
-            <div className="overflow-hidden transition-all duration-300" style={{ maxHeight: showWhy ? 240 : 0 }}>
-              <div className="mt-3 grid gap-2 text-xs text-muted-foreground">
-                {factors.map((f) => {
-                  const IconComponent = f.icon
-                  return (
-                    <div key={f.label} className="flex items-start gap-2">
-                      <IconComponent className="w-4 h-4 text-muted-foreground mt-0.5" />
-                      <div>
-                        <div className="text-card-foreground text-xs font-medium">{f.label}</div>
-                        <div className="text-xs text-muted-foreground">{f.text}</div>
-                      </div>
-                    </div>
-                  )
-                })}
-              </div>
-            </div>
-          </div>
-
-          <div className="pt-4 border-t border-border">
-            <div className="flex items-center justify-between gap-3 mb-3">
-              <div className="flex items-center gap-2 text-xs text-muted-foreground">
-                <Clock className="w-3 h-3" />
-                <span>{recommendation.timeline}</span>
-              </div>
-
-              <div className="flex items-center gap-2">
-                {recommendation.priority === "high" ? (
-                  <button onClick={() => setInProgress(true)} className={`text-sm px-3 py-2 rounded-md text-white bg-${p.accent} shadow-md hover:shadow-lg transition transform active:scale-95`} aria-pressed={inProgress}>
-                    {inProgress ? "In Progress" : "Act Now"}
-                  </button>
-                ) : recommendation.priority === "medium" ? (
-                  <button onClick={() => setAddedToRoadmap(true)} className={`text-sm px-3 py-2 rounded-md border border-${p.accent} ${p.text} bg-transparent transition transform active:scale-95`}>
-                    {addedToRoadmap ? "Added" : "Plan"}
-                  </button>
-                ) : (
-                  <button onClick={() => setAddedToRoadmap(true)} className={`text-sm px-2 py-1 rounded-md text-${p.text} bg-transparent underline transform active:scale-95`}>
-                    {addedToRoadmap ? "Roadmap" : "Add to Roadmap"}
-                  </button>
-                )}
-
-                <div className="flex items-center gap-2">
-                  <button onClick={() => setInProgress((s) => !s)} className="text-xs px-2 py-1 rounded-md bg-secondary/10 hover:bg-secondary/20 transform active:scale-95">
-                    {inProgress ? "Undo" : "Mark In Progress"}
-                  </button>
-                  <button onClick={() => setDeferred((s) => !s)} className="text-xs px-2 py-1 rounded-md bg-secondary/10 hover:bg-secondary/20 transform active:scale-95">
-                    {deferred ? "Undefer" : "Defer"}
-                  </button>
-                </div>
-              </div>
-            </div>
-
-            <div className="mt-1 h-2 bg-secondary rounded-full overflow-hidden">
-              <div className={`h-full ${p.bar}`} style={{ width: `${confidence}%` }} />
-            </div>
-          </div>
+    <div
+      className="glass-card rounded-xl p-6 border border-white/10 hover:border-white/20 transition-all duration-300 opacity-0 animate-fade-in-up group"
+      style={{ animationDelay: `${delay}ms` }}
+    >
+      {/* Header */}
+      <div className="flex items-start justify-between mb-4">
+        <div className={`p-2 rounded-lg ${style.badge}`}>
+          <Icon className={`w-5 h-5 ${style.icon}`} />
         </div>
+        <div className="flex items-center gap-2">
+          <span className={`text-xs font-medium px-2 py-1 rounded-full ${style.badge}`}>
+            {recommendation.priority.toUpperCase()}
+          </span>
+          <span className="text-xs font-medium px-2 py-1 rounded-full bg-secondary/30 text-muted-foreground">
+            {confidence}%
+          </span>
+        </div>
+      </div>
+
+      {/* Title */}
+      <h3 className="text-lg font-semibold text-foreground mb-2 line-clamp-2">{recommendation.title}</h3>
+
+      {/* Description */}
+      <p className="text-sm text-muted-foreground mb-4 line-clamp-2">{recommendation.description}</p>
+
+      {/* Impact & Timeline */}
+      <div className="space-y-3 mb-4">
+        <div className="flex items-center justify-between text-sm">
+          <span className="text-muted-foreground">Estimated Impact</span>
+          <span className="font-medium text-foreground">{recommendation.impact}</span>
+        </div>
+        <div className="flex items-center justify-between text-sm">
+          <span className="text-muted-foreground">Time to Implement</span>
+          <span className="font-medium text-foreground">{recommendation.timeline}</span>
+        </div>
+      </div>
+
+      {/* Progress Bar */}
+      <div className="mb-4">
+        <div className="flex items-center justify-between text-xs text-muted-foreground mb-2">
+          <span>Confidence Score</span>
+          <span className="font-medium text-foreground">{confidence}%</span>
+        </div>
+        <div className="h-2 bg-secondary rounded-full overflow-hidden">
+          <div className={`h-full ${style.progress} transition-all duration-500`} style={{ width: `${confidence}%` }} />
+        </div>
+      </div>
+
+      {/* Action Buttons */}
+      <div className="flex items-center gap-2 pt-4 border-t border-white/10">
+        <button className="flex-1 px-3 py-2 text-sm font-medium rounded-lg bg-primary text-primary-foreground hover:bg-primary/90 transition-colors">
+          View Details
+        </button>
+        <button
+          onClick={() => setInProgress(!inProgress)}
+          className={`px-3 py-2 text-sm font-medium rounded-lg border transition-colors ${
+            inProgress ? "border-warning bg-warning/10 text-warning" : "border-white/10 text-muted-foreground hover:border-white/20"
+          }`}
+        >
+          {inProgress ? "In Progress" : "Start"}
+        </button>
+        <button
+          onClick={() => setCompleted(!completed)}
+          className={`p-2 rounded-lg border transition-colors ${
+            completed ? "border-success bg-success/10" : "border-white/10 hover:border-white/20"
+          }`}
+        >
+          <CheckCircle2 className={`w-4 h-4 ${completed ? "text-success" : "text-muted-foreground"}`} />
+        </button>
       </div>
     </div>
   )

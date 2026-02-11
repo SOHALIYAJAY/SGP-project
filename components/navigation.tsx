@@ -47,7 +47,7 @@ export function Navigation() {
       <aside
         className={cn(
           "fixed left-0 top-0 h-screen z-50 hidden lg:flex flex-col transition-all duration-300 ease-in-out",
-          collapsed ? "w-16" : "w-56"
+          collapsed ? "w-16" : "w-48"
         )}
       >
         {/* Animated background glow */}
@@ -249,7 +249,7 @@ export function Navigation() {
       </header>
 
       {/* Spacer for content */}
-      <div className={cn("hidden lg:block transition-all duration-300", collapsed ? "w-16" : "w-56")} />
+      <div className={cn("hidden lg:block transition-all duration-300", collapsed ? "w-16" : "w-48")} />
       <div className="lg:hidden h-16" />
     </>
   )

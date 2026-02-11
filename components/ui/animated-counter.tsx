@@ -1,35 +1,48 @@
 "use client"
 
-import { useEffect, useState } from "react"
+import { useEffect, useState, useRef } from "react"
 
 interface AnimatedCounterProps {
-  value: number
+  end: number
+  suffix?: string
+  decimals?: number
   duration?: number
   className?: string
 }
 
 export function AnimatedCounter({
-  value,
-  duration = 1000,
+  end,
+  suffix = "",
+  decimals = 0,
+  duration = 2000,
   className = "",
 }: AnimatedCounterProps) {
   const [count, setCount] = useState(0)
+  const hasAnimated = useRef(false)
 
   useEffect(() => {
+    if (hasAnimated.current) return
+    hasAnimated.current = true
+
     let start = 0
-    const end = value
-    if (start === end) return
-
-    const incrementTime = Math.max(Math.floor(duration / end), 20)
-
+    const increment = end / (duration / 16)
+    
     const timer = setInterval(() => {
-      start += 1
-      setCount(start)
-      if (start >= end) clearInterval(timer)
-    }, incrementTime)
+      start += increment
+      if (start >= end) {
+        setCount(end)
+        clearInterval(timer)
+      } else {
+        setCount(start)
+      }
+    }, 16)
 
     return () => clearInterval(timer)
-  }, [value, duration])
+  }, [])
 
-  return <span className={className}>{count}</span>
+  return (
+    <span className={className}>
+      {count.toFixed(decimals)}{suffix}
+    </span>
+  )
 }

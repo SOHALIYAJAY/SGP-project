@@ -39,15 +39,13 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" className="dark">
-      <body className={`${inter.variable} font-sans antialiased bg-background text-foreground min-h-screen`}>
+      <body className={`${inter.variable} font-sans antialiased bg-background text-foreground`}>
         <LenisProvider>
           <Header />
-          <div className="flex min-h-[calc(100vh-4rem)]">
+          <div className="flex">
             <Navigation />
-            <main className="flex-1 min-w-0">
-              <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
-                {children}
-              </div>
+            <main className="flex-1 min-w-0 px-6 lg:px-10 xl:px-16">
+              {children}
             </main>
           </div>
         </LenisProvider>

@@ -435,10 +435,13 @@ export default function CustomerAnalyticsPage() {
 
         {/* Cohort Analysis */}
         <div className="glass-card rounded-xl p-6 mb-8 opacity-0 animate-fade-in-up stagger-5">
-          <div className="mb-6">
+          <div className="mb-2">
             <h3 className="text-lg font-semibold text-card-foreground">
               Cohort Retention
             </h3>
+            <p className="text-sm text-muted-foreground mt-1">
+              Track how customer groups retain over time. Each row shows a cohort's retention percentage month-by-month.
+            </p>
           </div>
           <div className="overflow-x-auto">
             <table className="w-full">
@@ -484,9 +487,14 @@ export default function CustomerAnalyticsPage() {
 
         {/* Customer Segments */}
         <div className="opacity-0 animate-fade-in-up stagger-6">
-          <h3 className="text-lg font-semibold text-foreground mb-6">
-            Segments
-          </h3>
+          <div className="mb-6">
+            <h3 className="text-lg font-semibold text-foreground">
+              Segments
+            </h3>
+            <p className="text-sm text-muted-foreground mt-1">
+              Customer groups by size and value. Shows count, revenue, growth rate, and lifetime value per segment.
+            </p>
+          </div>
           <div className="grid md:grid-cols-3 gap-6">
             {segmentData.map((segment, index) => (
               <SegmentCard key={segment.segment} {...segment} delay={700 + index * 100} />
@@ -541,9 +549,15 @@ function SegmentCard({
     return `$${value}`
   }
 
+  const getValueColor = (val: number) => {
+    if (val >= 1000000) return "text-success"
+    if (val >= 100000) return "text-primary"
+    return "text-warning"
+  }
+
   return (
     <div
-      className="glass-card rounded-xl p-6 card-hover opacity-0 animate-fade-in-up"
+      className="glass-card rounded-xl p-6 opacity-0 animate-fade-in-up"
       style={{ animationDelay: `${delay}ms` }}
     >
       <div className="flex items-center justify-between mb-4">
@@ -555,15 +569,15 @@ function SegmentCard({
       <div className="space-y-4">
         <div className="flex items-center justify-between">
           <span className="text-sm text-muted-foreground">Customers</span>
-          <span className="font-medium text-card-foreground">{count.toLocaleString()}</span>
+          <span className="font-semibold text-lg text-primary">{count.toLocaleString()}</span>
         </div>
         <div className="flex items-center justify-between">
           <span className="text-sm text-muted-foreground">Revenue</span>
-          <span className="font-medium text-card-foreground">{formatRevenue(revenue)}</span>
+          <span className={`font-semibold text-lg ${getValueColor(revenue)}`}>{formatRevenue(revenue)}</span>
         </div>
         <div className="flex items-center justify-between">
           <span className="text-sm text-muted-foreground">Avg. LTV</span>
-          <span className="font-medium text-primary">{formatRevenue(ltv)}</span>
+          <span className={`font-semibold text-lg ${getValueColor(ltv)}`}>{formatRevenue(ltv)}</span>
         </div>
         {/* Progress bar */}
         <div className="pt-2">

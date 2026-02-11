@@ -133,7 +133,7 @@ export default function InvestmentPage() {
             value={stageInfo.current}
             subtitle={`Last: ${stageInfo.lastRound}`}
             icon={Building2}
-            status="neutral"
+            status="warning"
             delay={100}
             sparkline={[1,1,1,2,2,3,3]}
           />
@@ -160,7 +160,7 @@ export default function InvestmentPage() {
             value={stageInfo.investors}
             subtitle="Institutional"
             icon={Users}
-            status="neutral"
+            status="warning"
             delay={400}
             sparkline={[2,2,2,2,3,3,3]}
           />
@@ -235,7 +235,7 @@ export default function InvestmentPage() {
             <p className="text-sm text-muted-foreground mb-6">
               Current ownership distribution
             </p>
-            <div className="h-40">
+            <div className="h-40 transition-transform duration-300 hover:scale-110">
               <ResponsiveContainer width="100%" height="100%">
                 <PieChart>
                   <Pie

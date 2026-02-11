@@ -3,9 +3,9 @@
 import { useState } from "react"
 import { useRouter } from "next/navigation"
 import { Button } from "@/components/ui/button"
-import Footer from "@/components/footer"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
+import Footer from "@/components/footer"
 import {
   Building2,
   Users,
@@ -79,7 +79,7 @@ export default function CompanyInputPage() {
   }
 
   return (
-    <div className="min-h-screen pt-24 pb-16 onboarding-bg">
+    <div className="pt-24 pb-0 onboarding-bg">
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Header */}
         <div className="text-center mb-12 opacity-0 animate-fade-in-up">
@@ -601,10 +601,9 @@ export default function CompanyInputPage() {
             </Button>
           </div>
         </div>
+       <br /><br /><br /><br /><br />
       </div>
-      <div className="mt-24 mb-0">
-        <Footer />
-      </div>
+      <Footer />
     </div>
   )
 }

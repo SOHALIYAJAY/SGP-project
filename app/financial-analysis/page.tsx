@@ -352,6 +352,7 @@ export default function FinancialAnalysisPage() {
           </div>
         </div>
       </SectionWrapper>
+      <br />
     </div>
   )
 }
@@ -395,13 +396,14 @@ function RiskFlagCard({
 
   return (
     <div
-      className={`glass-card border-l-4 ${style.border} rounded-xl p-6 card-hover opacity-0 animate-fade-in-up`}
+      className={`glass-card border-l-4 ${style.border} rounded-xl p-6 opacity-0 animate-fade-in-up`}
       style={{ animationDelay: `${delay}ms` } as React.CSSProperties}
     >
       <div className="flex items-start gap-4">
         <div className={`p-2 rounded-lg ${style.bg}`}>
           <Icon className={`w-5 h-5 ${style.iconColor}`} />
         </div>
+        <br />
         <div className="flex-1">
           <h4 className="font-semibold text-card-foreground mb-1">{title}</h4>
           <p className="text-sm text-muted-foreground mb-3">{description}</p>
@@ -409,8 +411,14 @@ function RiskFlagCard({
             <span className="text-xs text-muted-foreground">Recommended:</span>
             <span className="text-xs text-primary">{action}</span>
           </div>
+        
         </div>
+        <br /><br />
+        
       </div>
+      <br />
+      
     </div>
+    
   )
 }

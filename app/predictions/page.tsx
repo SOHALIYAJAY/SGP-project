@@ -1,9 +1,11 @@
 "use client"
 
-import React, { useState } from "react"
+import React, { useState, useEffect } from "react"
 import { SectionWrapper } from "@/components/ui/section-wrapper"
 import { AnimatedCounter } from "@/components/ui/animated-counter"
 import { useExportPDF } from "@/hooks/use-export-pdf"
+import { StatusSpotlightCard } from "@/components/ui/status-spotlight-card"
+import { CustomTooltip } from "@/components/ui/custom-tooltip"
 
 import {
   TrendingUp,
@@ -94,23 +96,6 @@ const predictions = [
   },
 ]
 
-const CustomTooltip = ({ active, payload, label }: { active?: boolean; payload?: Array<{ value: number; name: string; color: string }>; label?: string }) => {
-  if (active && payload && payload.length) {
-    return (
-      <div className="bg-card/95 backdrop-blur-sm border border-border rounded-lg p-3 shadow-xl">
-        <p className="text-sm font-medium text-foreground mb-2">{label}</p>
-        {payload.map((entry, index) => (
-          <p key={index} className="text-sm flex items-center gap-2" style={{ color: entry.color }}>
-            <span className="w-2 h-2 rounded-full" style={{ backgroundColor: entry.color }} />
-            {entry.name}: {typeof entry.value === "number" && entry.name.includes("Revenue") ? `$${entry.value}M` : entry.value.toLocaleString()}
-          </p>
-        ))}
-      </div>
-    )
-  }
-  return null
-}
-
 export default function PredictionsPage() {
   const { isExporting, handleExport } = useExportPDF(
     "predictions-content",
@@ -122,8 +107,8 @@ export default function PredictionsPage() {
   return (
     <div className="min-h-screen py-2">
       <SectionWrapper>
-        {/* Header with Export Button */}
-        <div className="mb-8 flex items-start justify-between">
+        {/* Header */}
+        <div className="mb-8">
           <div className="opacity-0 animate-fade-in-up">
             <h1 className="text-3xl md:text-4xl font-bold text-foreground mb-1">
               Growth Predictions
@@ -132,14 +117,6 @@ export default function PredictionsPage() {
               AI-powered forecasts based on current performance
             </p>
           </div>
-          <button
-            onClick={handleExport}
-            disabled={isExporting}
-            title="Download full analysis report (PDF)"
-            className="mt-2 p-2.5 rounded-lg bg-card hover:bg-secondary/80 border border-border text-muted-foreground hover:text-foreground transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-          >
-            <Download className="w-5 h-5" />
-          </button>
         </div>
 
         {/* Main Content Container for PDF Export */}
@@ -319,12 +296,13 @@ export default function PredictionsPage() {
                   />
                   <Tooltip
                     contentStyle={{
-                      backgroundColor: "var(--card)",
-                      border: "1px solid var(--border)",
+                      backgroundColor: "#0f172a",
+                      border: "1px solid rgba(255,255,255,0.1)",
                       borderRadius: "8px",
-                      backdropFilter: "blur(8px)",
+                      backdropFilter: "blur(12px)",
+                      boxShadow: "0 25px 50px -12px rgba(0, 0, 0, 0.5)",
                     }}
-                    labelStyle={{ color: "var(--card-foreground)" }}
+                    labelStyle={{ color: "var(--foreground)" }}
                     formatter={(value: number) => [`$${value}M`, ""]}
                   />
                 <Area
@@ -361,13 +339,13 @@ export default function PredictionsPage() {
         </div>
 
         {/* Prediction Timeline */}
-        <div className="mb-6 opacity-0 animate-fade-in-up stagger-6">
+        <div className="mb-4 opacity-0 animate-fade-in-up stagger-6">
           <h3 className="text-xl font-semibold text-foreground">
             Timeline
           </h3>
         </div>
 
-        <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+        <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6 mb-0">
           {predictions.map((prediction, index) => (
             <PredictionCard
               key={prediction.period}
@@ -400,19 +378,39 @@ function SummaryCard({
   color?: "primary" | "success" | "warning" | "accent"
   delay?: number
 }) {
+  const [displayValue, setDisplayValue] = useState(0)
+  const [isAnimating, setIsAnimating] = useState(true)
+
+  useEffect(() => {
+    const duration = 1500
+    const steps = 60
+    const increment = value / steps
+    let current = 0
+    let step = 0
+
+    const timer = setInterval(() => {
+      step++
+      current = Math.min(current + increment, value)
+      setDisplayValue(current)
+      
+      if (step >= steps || current >= value) {
+        setDisplayValue(value)
+        setIsAnimating(false)
+        clearInterval(timer)
+      }
+    }, duration / steps)
+
+    return () => clearInterval(timer)
+  }, [value])
+
   const colorStyles = {
-    primary: { border: "border-t-primary", glow: "shadow-[0_0_15px_rgba(6,182,212,0.15)]", sparkClass: "" },
-    success: { border: "border-t-success", glow: "shadow-[0_0_15px_rgba(34,197,94,0.15)]", sparkClass: "success" },
-    warning: { border: "border-t-warning", glow: "shadow-[0_0_15px_rgba(245,158,11,0.15)]", sparkClass: "warning" },
-    accent: { border: "border-t-accent", glow: "shadow-[0_0_15px_rgba(34,211,238,0.15)]", sparkClass: "" },
+    primary: { border: "border-t-4 border-primary hover:shadow-[0_0_25px_rgba(6,182,212,0.6)]", icon: "text-primary bg-primary/10", sparkColor: "#06B6D4", sparkData: [20, 22, 24, 26, 28, 29, 30] },
+    success: { border: "border-t-4 border-success hover:shadow-[0_0_25px_rgba(34,197,94,0.6)]", icon: "text-success bg-success/10", sparkColor: "#22C55E", sparkData: [18, 20, 22, 24, 26, 27, 28.2] },
+    warning: { border: "border-t-4 border-warning hover:shadow-[0_0_25px_rgba(245,158,11,0.6)]", icon: "text-warning bg-warning/10", sparkColor: "#F59E0B", sparkData: [4200, 4600, 5000, 5300, 5600, 5750, 5800] },
+    accent: { border: "border-t-4 border-accent hover:shadow-[0_0_25px_rgba(34,211,238,0.6)]", icon: "text-accent bg-accent/10", sparkColor: "#22D3EE", sparkData: [88, 86, 84, 83, 82, 81.5, 81] },
   }
 
-  const iconStyles = {
-    primary: "text-primary bg-primary/10",
-    success: "text-success bg-success/10",
-    warning: "text-warning bg-warning/10",
-    accent: "text-accent bg-accent/10",
-  }
+  const style = colorStyles[color]
 
   const helpTexts: Record<string, string> = {
     "Growth": "Projected growth over next 24 months from baseline",
@@ -421,33 +419,88 @@ function SummaryCard({
     "Confidence": "Model confidence level based on historical accuracy",
   }
 
-  const style = colorStyles[color]
-
-  const [hasAnimated, setHasAnimated] = useState(false);
+  const formatValue = (val: number) => {
+    if (value % 1 !== 0) return val.toFixed(1)
+    return Math.round(val).toString()
+  }
 
   return (
-    <div
-      className="relative glass-card rounded-xl p-6 opacity-0 animate-fade-in-up overflow-visible"
-      style={{ animationDelay: `${delay}ms` }}
-      onAnimationEnd={() => setHasAnimated(true)}
-    >
-      <div className="flex items-start justify-between mb-4">
-        <span className="text-sm text-muted-foreground">{label}</span>
-        <div className={`p-2 rounded-lg ${iconStyles[color]}`}>
-          <Icon className="w-5 h-5" />
+    <div className="opacity-0 animate-fade-in-up" style={{ animationDelay: `${delay}ms` }}>
+      <div className={`relative glass-card rounded-xl p-6 overflow-visible group transition-all duration-300 ${style.border}`}>
+        <div className="flex items-start justify-between mb-4">
+          <span className="text-sm text-muted-foreground">{label}</span>
+          <div className={`p-2 rounded-lg ${style.icon}`}>
+            <Icon className="w-5 h-5" />
+          </div>
         </div>
+        <div className="text-3xl font-bold text-card-foreground mb-2">
+          {prefix}{formatValue(displayValue)}{suffix}
+        </div>
+        <p className="text-xs text-muted-foreground/80 leading-relaxed mb-3">
+          {helpTexts[label] || "Key metric for prediction analysis"}
+        </p>
+        <Sparkline data={style.sparkData} color={style.sparkColor} delay={delay} />
       </div>
-      <div className="text-3xl font-bold text-card-foreground mb-2">
-        {hasAnimated ? (
-          <span>{prefix}{value}{suffix}</span>
-        ) : (
-          <AnimatedCounter end={value} prefix={prefix} suffix={suffix} decimals={value % 1 !== 0 ? 1 : 0} />
-        )}
-      </div>
-      <p className="text-xs text-muted-foreground/80 leading-relaxed">
-        {helpTexts[label] || "Key metric for prediction analysis"}
-      </p>
     </div>
+  )
+}
+
+function Sparkline({
+  data,
+  color = "#06B6D4",
+  delay = 0,
+}: {
+  data: number[]
+  color?: string
+  delay?: number
+}) {
+  const w = 120
+  const h = 36
+  const n = data.length
+  const min = Math.min(...data)
+  const max = Math.max(...data)
+  const range = max === min ? 1 : max - min
+
+  const pathD = data
+    .map((d, i) => {
+      const x = (i / Math.max(1, n - 1)) * w
+      const y = h - ((d - min) / range) * h
+      return `${i === 0 ? "M" : "L"} ${x} ${y}`
+    })
+    .join(" ")
+
+  const id = `spark-${data.join("-")}-${delay}`
+
+  return (
+    <svg viewBox={`0 0 ${w} ${h}`} width="100%" height={h} preserveAspectRatio="none" style={{ display: "block" }}>
+      <defs>
+        <linearGradient id={id} x1="0" x2="1">
+          <stop offset="0%" stopColor={color} stopOpacity="0.16" />
+          <stop offset="100%" stopColor={color} stopOpacity="0.02" />
+        </linearGradient>
+      </defs>
+      <path d={pathD} fill={`url(#${id})`} stroke="none" />
+      <path
+        d={pathD}
+        fill="none"
+        stroke={color}
+        strokeWidth={2}
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        pathLength={1}
+        strokeDasharray={1}
+        strokeDashoffset={1}
+      >
+        <animate
+          attributeName="stroke-dashoffset"
+          from="1"
+          to="0"
+          dur="0.8s"
+          begin={`${delay}ms`}
+          fill="freeze"
+        />
+      </path>
+    </svg>
   )
 }
 
@@ -464,16 +517,12 @@ function PredictionCard({
   status: "success" | "warning" | "danger"
   delay?: number
 }) {
-  const borderColor = {
-    success: "border-t-success group-hover:border-t-success",
-    warning: "border-t-warning group-hover:border-t-warning",
-    danger: "border-t-destructive group-hover:border-t-destructive",
-  }
+  const [isHovered, setIsHovered] = React.useState(false)
 
-  const glowColor = {
-    success: "shadow-[0_0_15px_rgba(34,197,94,0.15)]",
-    warning: "shadow-[0_0_15px_rgba(245,158,11,0.15)]",
-    danger: "shadow-[0_0_15px_rgba(239,68,68,0.15)]",
+  const borderGlow = {
+    success: "border-t-4 border-success hover:shadow-[0_0_25px_rgba(34,197,94,0.6)]",
+    warning: "border-t-4 border-warning hover:shadow-[0_0_25px_rgba(245,158,11,0.6)]",
+    danger: "border-t-4 border-destructive hover:shadow-[0_0_25px_rgba(239,68,68,0.6)]",
   }
 
   const badgeColor = {
@@ -495,39 +544,44 @@ function PredictionCard({
   }
 
   return (
-    <div
-      className="group relative glass-card rounded-xl p-6 opacity-0 animate-fade-in-up overflow-visible h-full flex flex-col"
-      style={{ animationDelay: `${delay}ms` } as React.CSSProperties}
-    >
-      <div className="flex items-start justify-between mb-4">
-        <span className="font-semibold text-card-foreground">{period}</span>
-        <div className="flex items-center gap-2">
-          <svg width="40" height="20" className="opacity-60 group-hover:opacity-100 transition-opacity">
-            <polyline points={sparklineData[status].map((v, i) => `${(i / 6) * 40},${20 - v / 4}`).join(' ')} fill="none" stroke={sparklineColor[status]} strokeWidth="1.5" />
-          </svg>
-          <span className={`text-xs font-medium px-2 py-1 rounded-full ${badgeColor[status]}`}>
-            {confidence}%
-          </span>
-        </div>
-      </div>
-
-      <div className="space-y-3">
-        {metrics.map((metric) => (
-          <div key={metric.label} className="space-y-1">
-            <div className="flex items-center justify-between text-sm">
-              <span className="text-muted-foreground">{metric.label}</span>
-              <span className="font-medium text-card-foreground">{metric.value}</span>
-            </div>
-            <div className="h-1.5 bg-secondary rounded-full overflow-hidden">
-              <div
-                className={`h-full rounded-full transition-all duration-500 ${
-                  metric.positive ? "bg-success" : "bg-destructive"
-                }`}
-                style={{ width: `${Math.min(metric.change, 100)}%` }}
-              />
-            </div>
+    <div className="opacity-0 animate-fade-in-up h-full" style={{ animationDelay: `${delay}ms` }}>
+      <div
+        className={`group relative glass-card rounded-xl p-6 overflow-visible h-full flex flex-col transition-all duration-300 ${borderGlow[status]}`}
+        onMouseEnter={() => setIsHovered(true)}
+        onMouseLeave={() => setIsHovered(false)}
+      >
+        <div className="flex items-start justify-between mb-4">
+          <span className="font-semibold text-card-foreground">{period}</span>
+          <div className="flex items-center gap-2">
+            {isHovered && (
+              <svg width="40" height="20" className="animate-fade-in">
+                <polyline points={sparklineData[status].map((v, i) => `${(i / 6) * 40},${20 - v / 4}`).join(' ')} fill="none" stroke={sparklineColor[status]} strokeWidth="1.5" />
+              </svg>
+            )}
+            <span className={`text-xs font-medium px-2 py-1 rounded-full ${badgeColor[status]}`}>
+              {confidence}%
+            </span>
           </div>
-        ))}
+        </div>
+
+        <div className="space-y-3">
+          {metrics.map((metric) => (
+            <div key={metric.label} className="space-y-1">
+              <div className="flex items-center justify-between text-sm">
+                <span className="text-muted-foreground">{metric.label}</span>
+                <span className="font-medium text-card-foreground">{metric.value}</span>
+              </div>
+              <div className="h-1.5 bg-secondary rounded-full overflow-hidden">
+                <div
+                  className={`h-full rounded-full transition-all duration-500 ${
+                    metric.positive ? "bg-success" : "bg-destructive"
+                  }`}
+                  style={{ width: `${Math.min(metric.change, 100)}%` }}
+                />
+              </div>
+            </div>
+          ))}
+        </div>
       </div>
     </div>
   )

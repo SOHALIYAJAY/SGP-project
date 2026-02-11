@@ -272,7 +272,7 @@ export default function RiskAssessmentPage() {
             <p className="text-sm text-muted-foreground mb-4">
               Risk distribution by severity level
             </p>
-            <div className="h-40 mb-4">
+            <div className="h-40 mb-4 transition-transform duration-300 hover:scale-110">
               <ResponsiveContainer width="100%" height="100%">
                 <PieChart>
                   <Pie
@@ -470,7 +470,7 @@ function RiskCategoryCard({
 
   return (
     <div
-      className={`glass-card border-t-[3px] ${style.border} rounded-xl p-6 card-hover opacity-0 animate-fade-in-up`}
+      className={`glass-card border-t-[3px] ${style.border} rounded-xl p-6 opacity-0 animate-fade-in-up`}
       style={{ animationDelay: `${delay}ms` } as React.CSSProperties}
     >
       <div className="flex items-center justify-between mb-4">
@@ -531,7 +531,7 @@ function SustainabilityCard({
 
   return (
     <div
-      className="glass-card rounded-xl p-6 card-hover opacity-0 animate-fade-in-up"
+      className="glass-card rounded-xl p-6 opacity-0 animate-fade-in-up"
       style={{ animationDelay: `${delay}ms` } as React.CSSProperties}
     >
       <h4 className="font-medium text-card-foreground mb-4">{name}</h4>

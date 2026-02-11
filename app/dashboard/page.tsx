@@ -6,6 +6,7 @@ import { SectionWrapper } from "@/components/ui/section-wrapper"
 import { useExportPDF } from "@/hooks/use-export-pdf"
 import { GlowCard } from "@/components/ui/spotlight-card";
 import { DashboardGlowCard } from "@/components/ui/dashboard-glow-card";
+import { CustomTooltip } from "@/components/ui/custom-tooltip"
 
 import {
   Activity,
@@ -92,23 +93,6 @@ const riskDistributionData = [
   { name: "Dependency", value: 48, fill: "url(#colorDependency)" },
 ]
 
-const CustomTooltip = ({ active, payload, label }: { active?: boolean; payload?: Array<{ value: number; name: string; color: string }>; label?: string }) => {
-  if (active && payload && payload.length) {
-    return (
-      <div className="bg-card/95 backdrop-blur-sm border border-border rounded-lg p-3 shadow-xl">
-        <p className="text-sm font-medium text-foreground mb-2">{label}</p>
-        {payload.map((entry, index) => (
-          <p key={index} className="text-sm flex items-center gap-2" style={{ color: entry.color }}>
-            <span className="w-2 h-2 rounded-full" style={{ backgroundColor: entry.color }} />
-            {entry.name}: ${(entry.value / 1000).toFixed(1)}K
-          </p>
-        ))}
-      </div>
-    )
-  }
-  return null
-}
-
 export default function DashboardPage() {
   const { isExporting, handleExport } = useExportPDF(
     "dashboard-content",
@@ -118,7 +102,7 @@ export default function DashboardPage() {
   )
 
   return (
-    <div className="min-h-screen py-2">
+    <div className="py-2">
       <SectionWrapper>
         {/* Header with Export Button */}
         <div className="mb-8 flex items-start justify-between">
@@ -372,16 +356,7 @@ export default function DashboardPage() {
                     tick={{ fill: "#64748B", fontSize: 12 }}
                     tickFormatter={(value) => `$${value}K`}
                   />
-                  <Tooltip
-                    contentStyle={{
-                      backgroundColor: "rgba(17, 24, 39, 0.95)",
-                      border: "1px solid #1E293B",
-                      borderRadius: "8px",
-                      backdropFilter: "blur(8px)",
-                    }}
-                    labelStyle={{ color: "#F1F5F9" }}
-                    formatter={(value: number) => [`$${value}K`, ""]}
-                  />
+                  <Tooltip content={<CustomTooltip />} />
                   <Bar dataKey="mrr" name="MRR" fill="#06B6D4" radius={[4, 4, 0, 0]} />
                   <Bar dataKey="arr" name="ARR" fill="#22D3EE" radius={[4, 4, 0, 0]} opacity={0.6} />
                 </BarChart>
@@ -499,16 +474,7 @@ export default function DashboardPage() {
                   dot={{ fill: "#06B6D4", r: 5, strokeWidth: 2, stroke: "#0B1220" }}
                   activeDot={{ r: 7, fill: "#22D3EE" }}
                 />
-                <Tooltip
-                  contentStyle={{
-                    backgroundColor: "rgba(17, 24, 39, 0.95)",
-                    border: "1px solid #1E293B",
-                    borderRadius: "8px",
-                    backdropFilter: "blur(8px)",
-                  }}
-                  labelStyle={{ color: "#F1F5F9" }}
-                  formatter={(value: number) => [`Risk Level: ${value}`, ""]}
-                />
+                <Tooltip content={<CustomTooltip />} />
               </RadarChart>
             </ResponsiveContainer>
           </div>

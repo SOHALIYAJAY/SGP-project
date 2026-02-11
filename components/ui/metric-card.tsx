@@ -1,9 +1,9 @@
 "use client"
 
-import { ReactNode } from "react"
+import { ReactNode, useMemo, useState, useEffect } from "react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { AnimatedCounter } from "./animated-counter"
-import { GlowCard } from "./glow-card"
+import { StatusSpotlightCard } from "./status-spotlight-card"
 
 interface MetricCardProps {
   title: string
@@ -29,6 +29,48 @@ export function MetricCard({
   sparkline,
   delay = 0,
 }: MetricCardProps) {
+  const [displayValue, setDisplayValue] = useState<number>(0)
+  const [isAnimating, setIsAnimating] = useState(true)
+
+  const numValue = typeof value === "string" ? parseFloat(value.replace(/[^0-9.-]+/g, "")) : value
+  const isNumeric = !isNaN(numValue)
+
+  useEffect(() => {
+    if (!isNumeric) {
+      setIsAnimating(false)
+      return
+    }
+
+    const duration = 1500
+    const steps = 60
+    const increment = numValue / steps
+    let current = 0
+    let step = 0
+
+    const timer = setInterval(() => {
+      step++
+      current = Math.min(current + increment, numValue)
+      setDisplayValue(current)
+      
+      if (step >= steps || current >= numValue) {
+        setDisplayValue(numValue)
+        setIsAnimating(false)
+        clearInterval(timer)
+      }
+    }, duration / steps)
+
+    return () => clearInterval(timer)
+  }, [numValue, isNumeric])
+
+  const borderGlow = 
+    status === "success"
+      ? "border-t-4 border-success hover:shadow-[0_0_25px_rgba(34,197,94,0.6)]"
+      : status === "warning"
+      ? "border-t-4 border-warning hover:shadow-[0_0_25px_rgba(245,158,11,0.6)]"
+      : status === "danger"
+      ? "border-t-4 border-destructive hover:shadow-[0_0_25px_rgba(239,68,68,0.6)]"
+      : "border-t-4 border-primary hover:shadow-[0_0_25px_rgba(6,182,212,0.6)]"
+
   const statusColor =
     status === "success"
       ? "text-success"
@@ -47,31 +89,34 @@ export function MetricCard({
       ? "#EF4444"
       : "#06B6D4"
 
+  const isPeak = numValue >= 85 || value === "A-" || value === "A" || value === "A+"
+
+  const formatDisplayValue = () => {
+    if (!isNumeric) return value
+    
+    const valueStr = typeof value === "string" ? value : ""
+    const hasPercent = valueStr.includes("%")
+    const formatted = Math.round(displayValue)
+    
+    return hasPercent ? `${formatted}%` : formatted
+  }
+
   return (
-    <GlowCard
-      status={status || "neutral"}
-      className="opacity-0 animate-fade-in-up h-full"
-    >
+    <div className="opacity-0 animate-fade-in-up h-full" style={{ animationDelay: `${delay}ms` }}>
       <Card
-        className={`card-hover h-full bg-transparent border-0 ${status ? `status-${status}` : ""}`}
-        style={{ animationDelay: `${delay}ms`, ["--spark-color" as any]: sparkColor }}
+        className={`card-hover h-full bg-card/50 backdrop-blur-sm border transition-all duration-300 ${borderGlow} ${
+          isPeak ? "border-border/60" : "border-border/40"
+        }`}
+        style={{ ["--spark-color" as any]: sparkColor }}
       >
         <CardHeader className="flex flex-row items-center justify-between pb-2">
-          <CardTitle className="text-sm font-medium">{title}</CardTitle>
-          {Icon && <Icon className={`w-5 h-5 ${statusColor}`} />}
+          <CardTitle className={`text-sm font-medium transition-all ${isPeak ? "font-semibold" : ""}`}>{title}</CardTitle>
+          {Icon && <Icon className={`w-5 h-5 ${statusColor} transition-all ${isPeak ? "opacity-100" : "opacity-80"}`} />}
         </CardHeader>
 
         <CardContent>
-          <div className="text-2xl font-bold">
-            {typeof value === "number" ? (
-              <AnimatedCounter value={value as number} />
-            ) : typeof value === "string" && value.trim().endsWith("%") && !isNaN(Number(value.replace(/[^0-9.-]+/g, ""))) ? (
-              <>
-                <AnimatedCounter value={Number(value.replace(/[^0-9.-]+/g, ""))} />%
-              </>
-            ) : (
-              value
-            )}
+          <div className={`text-2xl font-bold transition-all ${isPeak ? "text-foreground" : "text-foreground/90"}`}>
+            {isNumeric && isAnimating ? formatDisplayValue() : value}
           </div>
 
           {subtitle && (
@@ -97,7 +142,7 @@ export function MetricCard({
           )}
         </CardContent>
       </Card>
-    </GlowCard>
+    </div>
   )
 }
 
@@ -125,7 +170,7 @@ function Sparkline({
     })
     .join(" ")
 
-  const id = `spark-${Math.random().toString(36).slice(2)}`
+  const id = useMemo(() => `spark-${data.join("-")}-${delay}`, [data, delay])
 
   return (
     <svg viewBox={`0 0 ${w} ${h}`} width="100%" height={h} preserveAspectRatio="none" style={{ display: "block" }}>

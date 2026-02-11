@@ -114,17 +114,15 @@ export default function MarketAnalysisPage() {
 
         {/* Key Metrics */}
         <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8 items-stretch">
-          <div className="border-t-4 border-t-cyan-500 h-full">
-            <MetricCard
-              title="Market Size"
-              value="$50B"
-              subtitle="Total Addressable"
-              icon={Globe}
-              status="neutral"
-              delay={100}
-              sparkline={[60,62,63,64,65,66,67]}
-            />
-          </div>
+          <MetricCard
+            title="Market Size"
+            value="$50B"
+            subtitle="Total Addressable"
+            icon={Globe}
+            status="neutral"
+            delay={100}
+            sparkline={[60,62,63,64,65,66,67]}
+          />
           <MetricCard
             title="Competition"
             value="Medium"

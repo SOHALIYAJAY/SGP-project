@@ -5,26 +5,31 @@ import { ShieldCheck, Activity, Github, Linkedin, Mail, Sparkles, Lock } from "l
 
 export default function Footer() {
   return (
-    <footer className="mt-auto border-t border-border bg-gradient-to-b from-background to-background/50 backdrop-blur-sm">
-      <div className="max-w-7xl mx-auto px-6 py-8">
-        
-        {/* Main Footer Content */}
+  <footer className="w-full border-t border-border bg-gradient-to-b from-background to-background/50 backdrop-blur-sm mt-8">      
+      {/* Container aligned with main content */}
+        <div className="px-6 lg:px-10 xl:px-16 pt-6 pb-4">
+
+        {/* Main Footer Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-6 mb-6">
-          
-          {/* Brand & Product Identity */}
+
+          {/* Brand Section */}
           <div className="lg:col-span-2">
-            <div className="flex items-center gap-3 mb-3">
+            <div className="flex items-center gap-3 mb-4">
               <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-primary to-accent flex items-center justify-center shadow-lg">
                 <Activity className="w-5 h-5 text-primary-foreground" />
               </div>
               <div>
                 <h3 className="text-base font-bold text-foreground">BAPS</h3>
-                <p className="text-xs text-muted-foreground">Business Analysis & Prediction</p>
+                <p className="text-xs text-muted-foreground">
+                  Business Analysis & Prediction
+                </p>
               </div>
             </div>
+
             <p className="text-sm text-muted-foreground mb-4 leading-relaxed">
               AI-powered business analysis, prediction, and decision support platform.
             </p>
+
             <div className="flex flex-wrap gap-2">
               <span className="inline-flex items-center gap-1 px-2 py-1 rounded-md bg-success/10 text-success text-xs font-medium">
                 <Lock className="w-3 h-3" /> Secure
@@ -38,7 +43,7 @@ export default function Footer() {
             </div>
           </div>
 
-          {/* Product Navigation */}
+          {/* Product */}
           <div>
             <h4 className="text-sm font-semibold text-foreground mb-3">Product</h4>
             <ul className="space-y-2">
@@ -50,7 +55,10 @@ export default function Footer() {
                 { label: "Market Analysis", href: "/market-analysis" },
               ].map((link) => (
                 <li key={link.href}>
-                  <Link href={link.href} className="text-sm text-muted-foreground hover:text-primary transition-colors">
+                  <Link
+                    href={link.href}
+                    className="text-sm text-muted-foreground hover:text-primary transition-colors"
+                  >
                     {link.label}
                   </Link>
                 </li>
@@ -58,7 +66,7 @@ export default function Footer() {
             </ul>
           </div>
 
-          {/* Analytics Pages */}
+          {/* Analytics */}
           <div>
             <h4 className="text-sm font-semibold text-foreground mb-3">Analytics</h4>
             <ul className="space-y-2">
@@ -70,7 +78,10 @@ export default function Footer() {
                 { label: "AI Recommendations", href: "/recommendations" },
               ].map((link) => (
                 <li key={link.href}>
-                  <Link href={link.href} className="text-sm text-muted-foreground hover:text-primary transition-colors">
+                  <Link
+                    href={link.href}
+                    className="text-sm text-muted-foreground hover:text-primary transition-colors"
+                  >
                     {link.label}
                   </Link>
                 </li>
@@ -78,7 +89,7 @@ export default function Footer() {
             </ul>
           </div>
 
-          {/* Platform Features */}
+          {/* Features */}
           <div>
             <h4 className="text-sm font-semibold text-foreground mb-3">Features</h4>
             <ul className="space-y-2">
@@ -90,13 +101,15 @@ export default function Footer() {
                 "Investment Readiness",
               ].map((feature) => (
                 <li key={feature}>
-                  <span className="text-sm text-muted-foreground">{feature}</span>
+                  <span className="text-sm text-muted-foreground">
+                    {feature}
+                  </span>
                 </li>
               ))}
             </ul>
           </div>
 
-          {/* Legal & Support */}
+          {/* Support */}
           <div>
             <h4 className="text-sm font-semibold text-foreground mb-3">Support</h4>
             <ul className="space-y-2 mb-4">
@@ -108,14 +121,16 @@ export default function Footer() {
                 { label: "Contact", href: "#" },
               ].map((link) => (
                 <li key={link.label}>
-                  <Link href={link.href} className="text-sm text-muted-foreground hover:text-primary transition-colors">
+                  <Link
+                    href={link.href}
+                    className="text-sm text-muted-foreground hover:text-primary transition-colors"
+                  >
                     {link.label}
                   </Link>
                 </li>
               ))}
             </ul>
-            
-            {/* Social Icons */}
+
             <div className="flex items-center gap-2">
               {[
                 { icon: Github, label: "GitHub", href: "#" },
@@ -136,7 +151,7 @@ export default function Footer() {
         </div>
 
         {/* Divider */}
-        <div className="border-t border-border/50 my-4" />
+        <div className="border-t border-border/50 mb-4" />
 
         {/* Bottom Bar */}
         <div className="flex flex-col md:flex-row items-center justify-between gap-3">

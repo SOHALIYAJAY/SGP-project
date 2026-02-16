@@ -5,7 +5,6 @@ import { Button } from "@/components/ui/button"
 import { AnimatedCounter } from "@/components/ui/animated-counter"
 import { Typewriter } from "@/components/ui/typewriter";
 import RainAnimation from "@/components/rain-animation"
-import Footer from "@/components/footer"
 
 import {
   ArrowRight,
@@ -244,10 +243,6 @@ export default function HomePage() {
           </div>
         </div>
       </section>
-<br />
-<br /><br /><br /><br />
-      <Footer />
-
     </div>
   )
 }

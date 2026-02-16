@@ -6,6 +6,7 @@ import './globals.css'
 import { LenisProvider } from '@/components/lenis-provider'
 import { Navigation } from '@/components/navigation'
 import { Header } from '@/components/header'
+import { ConditionalFooter } from '@/components/conditional-footer'
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-sans" });
 
@@ -44,8 +45,11 @@ export default function RootLayout({
           <Header />
           <div className="flex">
             <Navigation />
-            <main className="flex-1 min-w-0 px-6 lg:px-10 xl:px-16">
-              {children}
+            <main className="flex-1 min-w-0 flex flex-col">
+              <div className="flex-1 px-6 lg:px-10 xl:px-16">
+                {children}
+              </div>
+              <ConditionalFooter />
             </main>
           </div>
         </LenisProvider>

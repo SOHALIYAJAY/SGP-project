@@ -5,7 +5,6 @@ import { useRouter } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import Footer from "@/components/footer"
 import {
   Building2,
   Users,
@@ -567,7 +566,7 @@ export default function CompanyInputPage() {
               </div>
             </div>
           )}
-
+          
           {/* Navigation Buttons */}
           <div className="flex items-center justify-between mt-8 pt-6 border-t border-border">
             <Button
@@ -601,9 +600,12 @@ export default function CompanyInputPage() {
             </Button>
           </div>
         </div>
-       <br /><br /><br /><br /><br />
+        <br />
+        <br />
+        <br />
+        <br />
+        <br /><br /><br />
       </div>
-      <Footer />
     </div>
   )
 }

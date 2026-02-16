@@ -34,9 +34,9 @@ export function Header() {
   return (
     <>
       {/* Header */}
-      <header className="sticky top-0 z-40 w-full border-b border-border/50 bg-background/80 backdrop-blur-lg">
+      <header className="sticky top-0 z-40 w-full border-b border-white/5 bg-[#0A0F1E]/95 backdrop-blur-xl">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-end h-16">
+          <div className="flex items-center justify-end h-14">
             {/* Desktop Navigation */}
             <nav className="hidden md:flex items-center gap-1">
               {headerNavItems.map((item) => {
@@ -77,7 +77,7 @@ export function Header() {
 
           {/* Mobile Navigation */}
           {mobileMenuOpen && (
-            <div className="md:hidden border-t border-border/50 py-4 space-y-2">
+            <div className="md:hidden border-t border-white/5 py-4 space-y-2">
               {headerNavItems.map((item) => {
                 const Icon = item.icon
                 const isActive = pathname === item.href

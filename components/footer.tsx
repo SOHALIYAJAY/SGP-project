@@ -5,12 +5,11 @@ import { ShieldCheck, Activity, Github, Linkedin, Mail, Sparkles, Lock } from "l
 
 export default function Footer() {
   return (
-  <footer className="w-full border-t border-border bg-gradient-to-b from-background to-background/50 backdrop-blur-sm mt-8">      
-      {/* Container aligned with main content */}
-        <div className="px-6 lg:px-10 xl:px-16 pt-6 pb-4">
-
+    <footer className="w-full border-t border-border bg-gradient-to-b from-background to-background/50 backdrop-blur-sm mt-8">
+      <div className="w-full pt-4 pb-2">
+      
         {/* Main Footer Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-6 mb-6">
+        <div className="grid grid-cols-11 md:grid-cols-2 lg:grid-cols-6 gap-4 ml-8 mt-4 mb-3">
 
           {/* Brand Section */}
           <div className="lg:col-span-2">
@@ -151,10 +150,10 @@ export default function Footer() {
         </div>
 
         {/* Divider */}
-        <div className="border-t border-border/50 mb-4" />
+        <div className="border-t border-border/50 my-2" />
 
         {/* Bottom Bar */}
-        <div className="flex flex-col md:flex-row items-center justify-between gap-3">
+        <div className="flex flex-col md:flex-row items-center justify-between gap-2 pb-2">
           <p className="text-xs text-muted-foreground text-center md:text-left">
             © 2026 BAPS. All rights reserved.
           </p>

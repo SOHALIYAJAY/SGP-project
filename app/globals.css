@@ -3,19 +3,22 @@
 
 @custom-variant dark (&:is(.dark *));
 
-/* Premium Enterprise Dark Theme - Inspired by Stripe, Linear, Vercel, Datadog */
+/* Premium Enterprise Dark Theme - Layered Depth */
 :root {
-  /* Deep Navy Gradient Background - Foundation */
-  --bg-primary: #0B1220; /* deeper navy */
-  --bg-secondary: #0E1628; /* slightly lighter navy with blue tint */
-  --background: #0B1220;
-  --foreground: #F0F4F8; /* near white for high contrast headings */
+  /* Deep Navy Gradient Background - Darkest Layer */
+  --bg-primary: #070D19; /* deepest navy - page background */
+  --bg-secondary: #0B1220; /* darker navy - secondary background */
+  --background: #070D19;
+  --foreground: #F0F4F8;
 
-  /* Card styling - with semi-transparent depth */
-  --card: #0F1628;
+  /* Card styling - Elevated Layer with proper separation */
+  --card: #0F1628; /* lighter than page background */
   --card-foreground: #E8ECF1;
   --card-elevated: #12182E;
-  --card-border: rgba(255, 255, 255, 0.08);
+  --card-border: rgba(255, 255, 255, 0.05);
+
+  /* Chart background - Slightly different from card */
+  --chart-bg: #0B1220;
 
   /* Popover */
   --popover: #0F1628;
@@ -503,13 +506,13 @@
   border: 1px solid var(--card-border);
 }
 
-/* Premium Glassmorphic Card - Enhanced */
+/* Premium Glassmorphic Card - Enhanced with proper depth */
 .glass-card {
-  background: linear-gradient(135deg, rgba(15, 22, 40, 0.5) 0%, rgba(14, 22, 32, 0.3) 100%);
+  background: linear-gradient(135deg, rgba(15, 22, 40, 0.7) 0%, rgba(14, 22, 32, 0.5) 100%);
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
-  border: 1px solid var(--card-border);
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4), 0 1px 0 rgba(255, 255, 255, 0.03) inset;
 }
 
 /* Glow effects - Color-specific */
@@ -655,20 +658,25 @@
   opacity: 1;
 }
 
-/* Status border colors - Premium look with glow */
+/* Status border colors - Permanent glow effect */
 .status-success {
-  border-top: 3px solid #22C55E;
-  --spark-color: rgba(34, 197, 94, 0.2);
+  border-top: 4px solid #22C55E;
+  box-shadow: 0 0 20px rgba(34, 197, 94, 0.4);
 }
 
 .status-warning {
-  border-top: 3px solid #F59E0B;
-  --spark-color: rgba(245, 158, 11, 0.2);
+  border-top: 4px solid #F59E0B;
+  box-shadow: 0 0 20px rgba(245, 158, 11, 0.4);
 }
 
 .status-danger {
-  border-top: 3px solid #EF4444;
-  --spark-color: rgba(239, 68, 68, 0.2);
+  border-top: 4px solid #EF4444;
+  box-shadow: 0 0 20px rgba(239, 68, 68, 0.4);
+}
+
+.status-info {
+  border-top: 4px solid #0EA5E9;
+  box-shadow: 0 0 20px rgba(14, 165, 233, 0.4);
 }
 
 /* Smooth scrolling */
@@ -677,9 +685,9 @@ html {
   background: linear-gradient(135deg, #0B1220 0%, #0E1628 100%);
 }
 
-/* Premium background with subtle noise texture */
+/* Premium background with layered depth */
 body {
-  background: linear-gradient(135deg, #0B1220 0%, #0E1628 100%);
+  background: linear-gradient(135deg, #070D19 0%, #0B1220 100%);
   position: relative;
 }
 

@@ -46,12 +46,12 @@ export function Navigation() {
       {/* Desktop Sidebar */}
       <aside
         className={cn(
-          "fixed left-0 top-0 h-screen z-50 hidden lg:flex flex-col transition-all duration-300 ease-in-out",
+          "sticky left-0 top-0 h-screen z-50 hidden lg:flex flex-col transition-all duration-300 ease-in-out",
           collapsed ? "w-16" : "w-48"
         )}
       >
         {/* Animated background glow */}
-        <div className="absolute inset-0 bg-slate-950 overflow-hidden">
+        <div className="absolute inset-0 bg-[#0A0F1E]/95 backdrop-blur-xl overflow-hidden border-r border-white/5">
           {/* Floating orbs */}
           <div className="absolute top-20 left-4 w-32 h-32 bg-primary/5 rounded-full blur-3xl animate-orb-float" />
           <div className="absolute bottom-40 right-0 w-24 h-24 bg-accent/5 rounded-full blur-2xl animate-orb-float" style={{ animationDelay: '1s' }} />
@@ -63,14 +63,13 @@ export function Navigation() {
           </div>
         </div>
 
-        {/* Sidebar border with glow effect */}
-        <div className="absolute right-0 top-0 h-full w-px bg-border/30" />
+
 
         {/* Content */}
         <div className="relative z-10 flex flex-col h-full">
           {/* Logo */}
           <div className={cn(
-            "flex items-center h-20 px-4 border-b border-border/50",
+            "flex items-center h-14 px-4 border-b border-white/5",
             collapsed ? "justify-center" : "gap-3"
           )}>
             <div className="relative group">
@@ -176,7 +175,7 @@ export function Navigation() {
           {/* Collapse Toggle */}
           <button
             onClick={() => setCollapsed(!collapsed)}
-            className="absolute -right-3 top-24 w-6 h-6 rounded-full bg-card border border-border flex items-center justify-center text-muted-foreground hover:text-foreground hover:bg-secondary transition-colors shadow-lg"
+            className="absolute -right-3 top-20 w-6 h-6 rounded-full bg-card border border-border flex items-center justify-center text-muted-foreground hover:text-foreground hover:bg-secondary transition-colors shadow-lg"
           >
             {collapsed ? <ChevronRight className="w-3 h-3" /> : <ChevronLeft className="w-3 h-3" />}
           </button>
@@ -184,8 +183,8 @@ export function Navigation() {
       </aside>
 
       {/* Mobile Header */}
-      <header className="fixed top-0 left-0 right-0 z-50 lg:hidden glass">
-        <div className="flex items-center justify-between h-16 px-4">
+      <header className="fixed top-0 left-0 right-0 z-50 lg:hidden bg-[#0A0F1E]/95 backdrop-blur-xl border-b border-white/5">
+        <div className="flex items-center justify-between h-14 px-4">
           <Link href="/" className="flex items-center gap-2">
             <div className="relative">
               <div className="absolute inset-0 bg-gradient-to-br from-primary to-accent rounded-lg blur-md opacity-50" />
@@ -210,7 +209,7 @@ export function Navigation() {
 
         {/* Mobile Menu */}
         {mobileMenuOpen && (
-          <div className="glass border-t border-border animate-fade-in">
+          <div className="bg-[#0A0F1E]/95 backdrop-blur-xl border-t border-white/5 animate-fade-in">
             <div className="px-4 py-4 space-y-1 max-h-[calc(100vh-4rem)] overflow-y-auto">
               {navItems.map((item, index) => {
                 const Icon = item.icon
@@ -249,8 +248,7 @@ export function Navigation() {
       </header>
 
       {/* Spacer for content */}
-      <div className={cn("hidden lg:block transition-all duration-300", collapsed ? "w-16" : "w-48")} />
-      <div className="lg:hidden h-16" />
+      <div className="lg:hidden h-14" />
     </>
   )
 }

@@ -1,0 +1,53 @@
+# Default Configuration for BAPS ML System
+
+data:
+  raw_data_path: "data/raw"
+  processed_data_path: "data/processed"
+  external_data_path: "data/external"
+  test_size: 0.2
+  validation_size: 0.1
+  random_state: 42
+
+model:
+  models_dir: "models"
+  default_model_type: "xgboost"
+  cross_validation_folds: 5
+  hyperparameter_tuning: true
+  feature_selection: true
+
+training:
+  max_iter: 1000
+  early_stopping: true
+  n_jobs: -1
+  verbose: 1
+
+evaluation:
+  metrics: ["mse", "mae", "r2", "mape"]
+  save_plots: true
+  plots_dir: "plots"
+  cross_validate: true
+
+inference:
+  batch_size: 1000
+  cache_models: true
+  confidence_threshold: 0.7
+
+logging:
+  level: "INFO"
+  format: "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+  file: "logs/ml_system.log"
+
+feature_engineering:
+  create_financial_ratios: true
+  create_growth_features: true
+  create_market_features: true
+  create_operational_features: true
+  create_temporal_features: true
+  create_interaction_features: true
+  create_polynomial_features: true
+  polynomial_degree: 2
+
+model_selection:
+  algorithms: ["linear_regression", "ridge", "random_forest", "gradient_boosting", "xgboost", "lightgbm"]
+  primary_metric: "r2"
+  cv_scoring: "neg_mean_squared_error"

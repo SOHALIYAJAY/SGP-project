@@ -4,8 +4,11 @@ import React, { useState, useEffect } from "react"
 import { SectionWrapper } from "@/components/ui/section-wrapper"
 import { AnimatedCounter } from "@/components/ui/animated-counter"
 import { useExportPDF } from "@/hooks/use-export-pdf"
-import { StatusSpotlightCard } from "@/components/ui/status-spotlight-card"
 import { CustomTooltip } from "@/components/ui/custom-tooltip"
+import { Button } from "@/components/ui/button"
+import { MetricCard } from "@/components/ui/metric-card"
+import { useCompanyData } from "@/hooks/useCompanyData"
+import { FillCompanyFirst } from "@/components/ui/fill-company-first"
 
 import {
   TrendingUp,
@@ -18,26 +21,92 @@ import {
 import {
   LineChart,
   Line,
+  BarChart,
+  Bar,
   XAxis,
   YAxis,
   CartesianGrid,
   Tooltip,
   ResponsiveContainer,
-  AreaChart,
+  Legend,
+} from "recharts"
+import {
   Area,
   ComposedChart,
-  Bar,
-  Legend,
 } from "recharts"
 import ChartInsight from '@/components/chart-insight'
 
 export default function PredictionsPage() {
   const [analysisData, setAnalysisData] = useState<any>(null)
   const [loading, setLoading] = useState(true)
+  const { hasCompanyData, isLoading: companyDataLoading } = useCompanyData()
   const { isExporting, handleExport } = useExportPDF(
     "predictions-content",
     "Growth_Predictions_Report.pdf",
+    "Growth Predictions Analysis",
+    analysisData?.input?.companyName || "Company"
   )
+
+  // Backend export function for predictions
+  const handleBackendExport = async () => {
+    try {
+      console.log("Starting Predictions PDF export from backend...")
+      
+      // Get company data from localStorage
+      const storedData = localStorage.getItem('companyAnalysisData')
+      const companyData = storedData ? JSON.parse(storedData) : {}
+      
+      // Call backend API for PDF generation
+      const response = await fetch('http://localhost:8000/api/export-pdf', {
+        method: 'POST',
+        headers: { 
+          'Content-Type': 'application/json',
+          'Accept': 'application/pdf'
+        },
+        body: JSON.stringify(companyData)
+      })
+      
+      if (!response.ok) {
+        throw new Error(`Backend export failed: ${response.status}`)
+      }
+      
+      // Get PDF blob
+      const blob = await response.blob()
+      
+      console.log("Predictions PDF blob type:", blob.type)
+      console.log("Predictions PDF blob size:", blob.size)
+      
+      // Check if it's actually a PDF
+      if (blob.type !== 'application/pdf') {
+        console.warn('Predictions response is not PDF, blob type:', blob.type)
+        const text = await blob.text()
+        console.error('Predictions backend response:', text)
+        throw new Error('Server did not return a PDF file')
+      }
+      
+      console.log("Creating predictions download link...")
+      
+      // Create download link
+      const url = window.URL.createObjectURL(blob)
+      const a = document.createElement('a')
+      a.href = url
+      a.download = "Growth_Predictions_Report.pdf"
+      document.body.appendChild(a)
+      a.click()
+      
+      console.log("Predictions download link clicked!")
+      
+      // Cleanup
+      window.URL.revokeObjectURL(url)
+      document.body.removeChild(a)
+      
+      console.log("Predictions PDF exported successfully from backend")
+      
+    } catch (error) {
+      console.error("Predictions PDF export error:", error)
+      alert("Predictions PDF export failed. Please try again.")
+    }
+  }
 
   useEffect(() => {
     // Fetch ML-powered predictions data
@@ -53,7 +122,7 @@ export default function PredictionsPage() {
           marketShare: "2.5"
         }
 
-        const response = await fetch('/api/analyze-company', {
+        const response = await fetch('http://localhost:8000/api/analyze-company', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(companyData)
@@ -73,7 +142,7 @@ export default function PredictionsPage() {
     fetchPredictionsData()
   }, [])
 
-  if (loading) {
+  if (loading || companyDataLoading) {
     return (
       <div className="min-h-screen py-2">
         <SectionWrapper>
@@ -84,6 +153,10 @@ export default function PredictionsPage() {
         </SectionWrapper>
       </div>
     )
+  }
+
+  if (!hasCompanyData) {
+    return <FillCompanyFirst />
   }
 
   if (!analysisData) {
@@ -139,7 +212,7 @@ export default function PredictionsPage() {
               <p className="text-xs text-success mt-2">🤖 Powered by ML Analysis</p>
             </div>
             <Button
-              onClick={handleExport}
+              onClick={handleBackendExport}
               disabled={isExporting}
               className="gap-2"
             >
@@ -151,7 +224,7 @@ export default function PredictionsPage() {
 
         {/* Summary Cards */}
         <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-          <StatusSpotlightCard
+          <MetricCard
             title="Growth"
             value={`${growthPredictions[0]?.confidence || 85}%`}
             subtitle="Confidence level"
@@ -159,7 +232,7 @@ export default function PredictionsPage() {
             icon={TrendingUp}
             delay={100}
           />
-          <StatusSpotlightCard
+          <MetricCard
             title="Revenue Target"
             value={formatCurrency(trajectoryData[trajectoryData.length - 1]?.revenue || 28.2)}
             subtitle="24-month projection"
@@ -167,7 +240,7 @@ export default function PredictionsPage() {
             icon={DollarSign}
             delay={200}
           />
-          <StatusSpotlightCard
+          <MetricCard
             title="Customer Target"
             value={(trajectoryData[trajectoryData.length - 1]?.customers || 5800).toLocaleString()}
             subtitle="24-month projection"
@@ -175,10 +248,10 @@ export default function PredictionsPage() {
             icon={Users}
             delay={300}
           />
-          <StatusSpotlightCard
-            title="Confidence"
-            value={`${growthPredictions[growthPredictions.length - 1]?.confidence || 75}%`}
-            subtitle="Prediction accuracy"
+          <MetricCard
+            title="Market Share"
+            value={`${trajectoryData[trajectoryData.length - 1]?.marketShare || 3.2}%`}
+            subtitle="24-month projection"
             status="warning"
             icon={Target}
             delay={400}

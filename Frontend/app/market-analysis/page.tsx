@@ -2,12 +2,16 @@
 
 import React, { useState, useEffect } from "react"
 import { SectionWrapper } from "@/components/ui/section-wrapper"
+import { AnimatedCounter } from "@/components/ui/animated-counter"
+import { useCompanyData } from "@/hooks/useCompanyData"
+import { FillCompanyFirst } from "@/components/ui/fill-company-first"
 import { MetricCard } from "@/components/ui/metric-card"
 import { ChartInfoIcon } from "@/components/ui/chart-info-icon"
+import { Button } from "@/components/ui/button"
+import Link from "next/link"
 import {
   Globe,
   Users,
-  Target,
   TrendingUp,
   Zap,
   Building2,
@@ -15,6 +19,7 @@ import {
   Rocket,
   BarChart3,
   AlertTriangle,
+  ArrowRight,
 } from "lucide-react"
 import {
   BarChart,
@@ -41,20 +46,18 @@ export default function MarketAnalysisPage() {
     // Fetch ML-powered market analytics
     const fetchMarketData = async () => {
       try {
-        // Get stored company data or use demo data
+        // Get stored company data
         const storedData = localStorage.getItem('companyAnalysisData')
-        const companyData = storedData ? JSON.parse(storedData) : {
-          companyName: "TechCorp Inc.",
-          revenue: "8200000",
-          marketSize: "50",
-          competitorCount: "15",
-          growthRate: "85",
-          marketShare: "2.5",
-          industryGrowthRate: "25",
-          nps: "72"
+        
+        if (!storedData) {
+          // No company data available - show fill company info message
+          setLoading(false)
+          return
         }
+        
+        const companyData = JSON.parse(storedData)
 
-        const response = await fetch('/api/analyze-company', {
+        const response = await fetch('http://localhost:8000/api/analyze-company', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(companyData)
@@ -91,8 +94,55 @@ export default function MarketAnalysisPage() {
     return (
       <div className="min-h-screen py-2">
         <SectionWrapper>
-          <div className="text-center">
-            <p className="text-muted-foreground">No market data available</p>
+          <div className="text-center max-w-2xl mx-auto">
+            <div className="mb-8">
+              <div className="w-20 h-20 rounded-full bg-gradient-to-br from-primary to-accent flex items-center justify-center mx-auto mb-6 text-2xl font-bold text-primary-foreground shadow-2xl">
+                📊
+              </div>
+              <h2 className="text-3xl font-bold text-foreground mb-4">
+                Market Analysis
+              </h2>
+              <p className="text-lg text-muted-foreground mb-8">
+                Please fill your company information first
+              </p>
+            </div>
+            
+            <div className="glass-card p-8 rounded-2xl text-left">
+              <h3 className="text-xl font-semibold text-foreground mb-6">
+                📋 Required Company Information
+              </h3>
+              
+              <div className="space-y-4 mb-8">
+                <div className="flex items-center gap-3">
+                  <div className="w-2 h-2 rounded-full bg-blue-500"></div>
+                  <span className="text-foreground">Company Name & Industry</span>
+                </div>
+                <div className="flex items-center gap-3">
+                  <div className="w-2 h-2 rounded-full bg-green-500"></div>
+                  <span className="text-foreground">Revenue & Financial Data</span>
+                </div>
+                <div className="flex items-center gap-3">
+                  <div className="w-2 h-2 rounded-full bg-amber-500"></div>
+                  <span className="text-foreground">Customer Metrics (ARPU, Churn)</span>
+                </div>
+                <div className="flex items-center gap-3">
+                  <div className="w-2 h-2 rounded-full bg-purple-500"></div>
+                  <span className="text-foreground">Market Information (Size, Growth)</span>
+                </div>
+              </div>
+              
+              <div className="text-center">
+                <Link href="/company-input">
+                  <Button size="lg" className="bg-gradient-to-r from-[#0EA5E9] to-[#06B6D4] text-white hover:opacity-90 transition-all duration-300 group px-8 shadow-lg shadow-cyan-500/20">
+                    Fill Company Information
+                    <ArrowRight className="ml-2 w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                  </Button>
+                </Link>
+                <p className="text-sm text-muted-foreground mt-4">
+                  Once you provide your company details, we'll generate comprehensive market analysis with real-time insights
+                </p>
+              </div>
+            </div>
           </div>
         </SectionWrapper>
       </div>
@@ -103,9 +153,9 @@ export default function MarketAnalysisPage() {
     { subject: "Market Size", A: marketData.marketSize * 2, fullMark: 100 },
     { subject: "Growth Rate", A: marketData.growthRate, fullMark: 100 },
     { subject: "Competition", A: 100 - (marketData.competition === "Low" ? 20 : marketData.competition === "Medium" ? 40 : 60), fullMark: 100 },
-    { subject: "Entry Barriers", A: marketData.opportunity * 0.8, fullMark: 100 },
-    { subject: "Profitability", A: marketData.opportunity * 0.9, fullMark: 100 },
-    { subject: "Innovation", A: marketData.opportunity, fullMark: 100 },
+    { subject: "Entry Barriers", A: 75, fullMark: 100 },
+    { subject: "Profitability", A: 80, fullMark: 100 },
+    { subject: "Innovation", A: 85, fullMark: 100 },
   ]
 
   const CustomTooltip = ({ active, payload, label }: { active?: boolean; payload?: Array<{ value: number; name: string; color: string }>; label?: string }) => {
@@ -160,22 +210,12 @@ export default function MarketAnalysisPage() {
             sparkline={[18,16,17,15,marketData.competition === "Low" ? 10 : marketData.competition === "Medium" ? 20 : 30]}
           />
           <MetricCard
-            title="Opportunity"
-            value={`${marketData.opportunity.toFixed(0)}%`}
-            subtitle="Market opportunity score"
-            icon={Target}
-            status="success"
-            trend={{ value: marketData.growthRate * 0.2, label: "potential" }}
-            delay={300}
-            sparkline={[70,75,78,82,85,marketData.opportunity]}
-          />
-          <MetricCard
             title="Growth Rate"
             value={`${marketData.growthRate}%`}
             subtitle="Annual market growth"
             icon={TrendingUp}
             status="success"
-            delay={400}
+            delay={300}
             sparkline={[20,22,24,26,28,marketData.growthRate]}
           />
         </div>
@@ -189,7 +229,7 @@ export default function MarketAnalysisPage() {
                 title="Market Overview"
                 level="High"
                 summary="Strong growth; moderate competition."
-                bullets={["Market expanding 85% annually", "Competition manageable at Medium level", "High opportunity score indicates potential"]}
+                bullets={["Market expanding 85% annually", "Competition manageable at Medium level", "Strong growth trajectory indicates potential"]}
               />
             </div>
             <div className="mb-6">
@@ -398,77 +438,7 @@ export default function MarketAnalysisPage() {
           </div>
         </div>
 
-        {/* Market Opportunities */}
-        <div className="opacity-0 animate-fade-in-up stagger-6">
-          <div className="mb-6">
-            <h3 className="text-lg font-semibold text-foreground">
-              Market Opportunities
-            </h3>
-            <p className="text-sm text-muted-foreground mt-1">
-              Key growth opportunities and market expansion strategies based on ML analysis.
-            </p>
-          </div>
-          <div className="grid md:grid-cols-3 gap-6">
-            <OpportunityCard
-              icon={Rocket}
-              title="High-Growth Segments"
-              description="Focus on enterprise and mid-market segments showing 25-35% growth rates."
-              impact="High"
-              delay={700}
-            />
-            <OpportunityCard
-              icon={Lightbulb}
-              title="Innovation Leadership"
-              description="Leverage technology advantage to differentiate from competitors."
-              impact="Medium"
-              delay={800}
-            />
-            <OpportunityCard
-              icon={Building2}
-              title="Geographic Expansion"
-              description="Expand into underserved markets with lower competition."
-              impact="High"
-              delay={900}
-            />
-          </div>
-        </div>
       </SectionWrapper>
-    </div>
-  )
-}
-
-function OpportunityCard({
-  icon: Icon,
-  title,
-  description,
-  impact,
-  delay = 0,
-}: {
-  icon: any
-  title: string
-  description: string
-  impact: string
-  delay?: number
-}) {
-  return (
-    <div
-      className="glass-card rounded-xl p-6 opacity-0 animate-fade-in-up"
-      style={{ animationDelay: `${delay}ms` }}
-    >
-      <div className="flex items-center gap-3 mb-4">
-        <div className="p-2 rounded-lg bg-primary/10">
-          <Icon className="h-5 w-5 text-primary" />
-        </div>
-        <span className={`text-xs font-medium px-2 py-1 rounded-full ${
-          impact === "High" ? "bg-success/10 text-success" :
-          impact === "Medium" ? "bg-warning/10 text-warning" :
-          "bg-muted text-muted-foreground"
-        }`}>
-          {impact} Impact
-        </span>
-      </div>
-      <h4 className="font-semibold text-card-foreground mb-2">{title}</h4>
-      <p className="text-sm text-muted-foreground">{description}</p>
     </div>
   )
 }

@@ -26,6 +26,7 @@ const steps = [
 export default function CompanyInputPage() {
   const router = useRouter()
   const [currentStep, setCurrentStep] = useState(1)
+  const [showSuccess, setShowSuccess] = useState(false)
   const [formData, setFormData] = useState({
     companyName: "",
     industry: "",
@@ -44,7 +45,6 @@ export default function CompanyInputPage() {
     competitorCount: "",
     growthRate: "",
     marketShare: "",
-    customerTypeMix: "",
     arpu: "",
     teamSize: "",
     customerCount: "",
@@ -67,9 +67,14 @@ export default function CompanyInputPage() {
     if (currentStep < 4) {
       setCurrentStep((prev) => prev + 1)
     } else {
-      // Save form data to localStorage before redirecting
+      // Save form data to localStorage
       localStorage.setItem('companyAnalysisData', JSON.stringify(formData))
-      router.push("/dashboard")
+      // Show success message
+      setShowSuccess(true)
+      // Redirect to dashboard after 3 seconds
+      setTimeout(() => {
+        router.push("/dashboard")
+      }, 3000)
     }
   }
 
@@ -387,7 +392,7 @@ export default function CompanyInputPage() {
 
               <div className="grid md:grid-cols-2 gap-6">
                 <div className="space-y-2">
-                  <Label htmlFor="marketSize">Total Addressable Market ($B)</Label>
+                  <Label htmlFor="marketSize">Market Size ($)</Label>
                   <Input
                     id="marketSize"
                     placeholder="e.g., 50"
@@ -440,16 +445,6 @@ export default function CompanyInputPage() {
                     type="number"
                     value={formData.industryGrowthRate}
                     onChange={(e) => updateFormData("industryGrowthRate", e.target.value)}
-                    className="form-input-premium form-input-purple"
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="customerTypeMix">Customer Type Mix</Label>
-                  <Input
-                    id="customerTypeMix"
-                    placeholder="e.g., 70% B2B, 30% B2C"
-                    value={formData.customerTypeMix}
-                    onChange={(e) => updateFormData("customerTypeMix", e.target.value)}
                     className="form-input-premium form-input-purple"
                   />
                 </div>
@@ -608,6 +603,28 @@ export default function CompanyInputPage() {
         <br />
         <br /><br /><br />
       </div>
+
+      {/* Success Message Overlay */}
+      {showSuccess && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-2xl p-8 max-w-md mx-4 text-center animate-fade-in-up">
+            <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
+              <CheckCircle2 className="w-8 h-8 text-green-600" />
+            </div>
+            <h2 className="text-2xl font-bold text-gray-900 mb-2">
+              Company Details Successfully Entered!
+            </h2>
+            <p className="text-gray-600 mb-6">
+              Your company information has been saved. Redirecting to your dashboard...
+            </p>
+            <div className="flex items-center justify-center space-x-2">
+              <div className="w-2 h-2 bg-blue-600 rounded-full animate-pulse"></div>
+              <div className="w-2 h-2 bg-blue-600 rounded-full animate-pulse delay-75"></div>
+              <div className="w-2 h-2 bg-blue-600 rounded-full animate-pulse delay-150"></div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   )
 }

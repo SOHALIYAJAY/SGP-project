@@ -339,24 +339,28 @@ class BusinessPredictor:
         n_samples = len(df_processed)
         metrics = {}
         
-        # Business health score (0-100)
+        # Business health score (0-100) - IMPROVED: More realistic scoring
         # This is a simplified calculation - in practice, you might use a separate model
         if 'revenue' in df_processed.columns:
-            revenue_score = np.clip(df_processed['revenue'].values * 10, 0, 40)
+            # Better revenue scoring - scale more appropriately
+            revenue_score = np.clip(df_processed['revenue'].values * 15, 0, 50)
         else:
             revenue_score = np.zeros(n_samples)
         
         if 'profitMargin' in df_processed.columns:
-            profit_score = np.clip(df_processed['profitMargin'].values * 25, 0, 25)
+            # Better profit scoring - reward positive margins more
+            profit_score = np.clip(df_processed['profitMargin'].values * 35, 0, 35)
         else:
             profit_score = np.zeros(n_samples)
         
         if 'growthRate' in df_processed.columns:
-            growth_score = np.clip(df_processed['growthRate'].values * 4, 0, 20)
+            # Better growth scoring - reward high growth more
+            growth_score = np.clip(df_processed['growthRate'].values * 6, 0, 30)
         else:
             growth_score = np.zeros(n_samples)
         
-        health_score = revenue_score + profit_score + growth_score + np.random.uniform(10, 15, n_samples)
+        # Add base score and reduce randomness - MORE REALISTIC
+        health_score = revenue_score + profit_score + growth_score + np.random.uniform(5, 10, n_samples)
         metrics['business_health'] = np.clip(health_score, 0, 100)
         
         # Risk level
@@ -370,16 +374,20 @@ class BusinessPredictor:
                 risk_levels.append("High")
         metrics['risk_level'] = np.array(risk_levels)
         
-        # Failure probability
-        failure_prob = np.maximum(5.0, 55.0 - metrics['business_health'] * 0.5)
-        metrics['failure_probability'] = np.clip(failure_prob, 5.0, 50.0)
+        # Failure probability - IMPROVED: Less pessimistic
+        failure_prob = np.maximum(3.0, 40.0 - metrics['business_health'] * 0.4)
+        metrics['failure_probability'] = np.clip(failure_prob, 3.0, 40.0)
         
-        # Investment readiness
+        # Investment readiness - IMPROVED: More realistic grading
         investment_grades = []
         for health in metrics['business_health']:
-            if health >= 80:
+            if health >= 85:
+                investment_grades.append("A")
+            elif health >= 70:
                 investment_grades.append("A-")
             elif health >= 55:
+                investment_grades.append("B+")
+            elif health >= 40:
                 investment_grades.append("B")
             else:
                 investment_grades.append("C+")

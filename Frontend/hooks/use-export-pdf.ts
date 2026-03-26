@@ -1,5 +1,5 @@
 import { useState } from "react"
-import { exportToPDF } from "@/lib/export-to-pdf"
+import { exportToPDFSimple } from "@/lib/export-to-pdf-simple"
 
 export function useExportPDF(elementId: string, fileName: string, title: string, companyName?: string) {
   const [isExporting, setIsExporting] = useState(false)
@@ -7,7 +7,7 @@ export function useExportPDF(elementId: string, fileName: string, title: string,
   const handleExport = async () => {
     setIsExporting(true)
     try {
-      await exportToPDF(elementId, fileName, title, companyName)
+      await exportToPDFSimple(elementId, fileName, title, companyName)
     } finally {
       setIsExporting(false)
     }

@@ -1,14 +1,20 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import Response
 from pydantic import BaseModel, Field
 from typing import List, Literal
 import sys
 import os
+from datetime import datetime
+import io
 
 # Add ML system to path
 sys.path.append(os.path.join(os.path.dirname(__file__), '..', 'ml', 'src'))
 
 from inference.predictor import BusinessPredictor
+
+# Import database stats
+from database_stats import router as database_router
 
 app = FastAPI(
     title="Business Analysis & Prediction Backend",
@@ -156,19 +162,341 @@ except Exception as e:
     print(f"  ML predictor not available, using fallback: {e}")
     predictor = None
 
-# Use in your API endpoint
+# Add validation endpoint
+@app.post("/api/validate-input")
+def validate_input(payload: CompanyInput) -> dict:
+    """
+    Validate company input data and provide feedback.
+    """
+    errors = []
+    warnings = []
+    
+    # Check required fields
+    if not payload.companyName:
+        errors.append("Company name is required")
+    
+    if not payload.industry:
+        errors.append("Industry is required")
+    
+    # Validate financial data
+    try:
+        revenue = float(payload.revenue) if payload.revenue else 0
+        if revenue <= 0:
+            warnings.append("Revenue should be greater than 0")
+    except (ValueError, TypeError):
+        errors.append("Revenue must be a valid number")
+    
+    try:
+        profit_margin = float(payload.profitMargin) if payload.profitMargin else 0
+        if profit_margin < -100 or profit_margin > 100:
+            warnings.append("Profit margin should be between -100% and 100%")
+    except (ValueError, TypeError):
+        errors.append("Profit margin must be a valid number")
+    
+    # Validate growth rates
+    try:
+        growth_rate = float(payload.growthRate) if payload.growthRate else 0
+        if growth_rate < -50 or growth_rate > 200:
+            warnings.append("Growth rate should be between -50% and 200%")
+    except (ValueError, TypeError):
+        errors.append("Growth rate must be a valid number")
+    
+    return {
+        "valid": len(errors) == 0,
+        "errors": errors,
+        "warnings": warnings,
+        "ready_for_analysis": len(errors) == 0
+    }
+
+# Add data export endpoint
+@app.post("/api/export-analysis")
+def export_analysis(payload: CompanyInput) -> dict:
+    """
+    Export analysis results in various formats.
+    """
+    try:
+        analysis = analyze_company(payload)
+        
+        return {
+            "success": True,
+            "data": {
+                "summary": analysis.summary.model_dump(),
+                "predictions": [p.model_dump() for p in analysis.growthPredictions],
+                "trajectory": [t.model_dump() for t in analysis.trajectory],
+                "scenarios": [s.model_dump() for s in analysis.scenarios],
+                "customer_analytics": analysis.customerAnalytics.model_dump(),
+                "market_analysis": analysis.marketAnalysis.model_dump(),
+                "financial_analysis": analysis.financialAnalysis.model_dump(),
+                "risk_assessment": analysis.riskAssessment.model_dump(),
+            },
+            "export_formats": ["json", "csv", "pdf"]
+        }
+    except Exception as e:
+        return {
+            "success": False,
+            "error": str(e)
+        }
+
+# Add PDF export endpoint
+@app.post("/api/export-pdf")
+def export_pdf(payload: CompanyInput):
+    """
+    Generate and return PDF report.
+    """
+    try:
+        analysis = analyze_company(payload)
+        
+        # Create PDF in memory
+        buffer = io.BytesIO()
+        from reportlab.lib.pagesizes import letter, A4
+        from reportlab.pdfgen import canvas
+        from reportlab.lib.units import inch
+        from reportlab.lib.colors import HexColor
+        
+        p = canvas.Canvas(buffer, pagesize=A4)
+        width, height = A4
+        
+        # Title
+        p.setFont("Helvetica-Bold", 20)
+        p.drawString(50, height - 50, "Business Analysis Report")
+        
+        # Company info
+        p.setFont("Helvetica", 12)
+        p.drawString(50, height - 80, f"Company: {payload.companyName}")
+        p.drawString(50, height - 100, f"Generated: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
+        
+        # Business Health
+        y_position = height - 140
+        p.setFont("Helvetica-Bold", 14)
+        p.drawString(50, y_position, "Business Health Summary")
+        y_position -= 25
+        
+        p.setFont("Helvetica", 10)
+        p.drawString(50, y_position, f"Health Score: {analysis.summary.businessHealth}/100")
+        y_position -= 15
+        p.drawString(50, y_position, f"Risk Level: {analysis.summary.riskLevel}")
+        y_position -= 15
+        p.drawString(50, y_position, f"Investment Grade: {analysis.summary.investmentReadiness}")
+        y_position -= 15
+        p.drawString(50, y_position, f"Failure Probability: {analysis.summary.failureProbability:.1f}%")
+        y_position -= 30
+        
+        # Financial Analysis
+        p.setFont("Helvetica-Bold", 14)
+        p.drawString(50, y_position, "Financial Analysis")
+        y_position -= 25
+        
+        p.setFont("Helvetica", 10)
+        p.drawString(50, y_position, f"Annual Revenue: ${analysis.financialAnalysis.annualRevenue:,.0f}")
+        y_position -= 15
+        p.drawString(50, y_position, f"Profit Margin: {analysis.financialAnalysis.profitMargin:.1f}%")
+        y_position -= 15
+        p.drawString(50, y_position, f"Burn Rate: ${analysis.financialAnalysis.burnRate:,.0f}/month")
+        y_position -= 15
+        p.drawString(50, y_position, f"Runway: {analysis.financialAnalysis.runway:.1f} months")
+        y_position -= 15
+        p.drawString(50, y_position, f"Financial Health: {analysis.financialAnalysis.financialHealth:.1f}/100")
+        y_position -= 30
+        
+        # Customer Analytics
+        p.setFont("Helvetica-Bold", 14)
+        p.drawString(50, y_position, "Customer Analytics")
+        y_position -= 25
+        
+        p.setFont("Helvetica", 10)
+        p.drawString(50, y_position, f"Customer Retention: {analysis.customerAnalytics.retentionRate:.1f}%")
+        y_position -= 15
+        p.drawString(50, y_position, f"Churn Rate: {analysis.customerAnalytics.churnRate:.1f}%")
+        y_position -= 15
+        p.drawString(50, y_position, f"NPS Score: {analysis.customerAnalytics.npsScore}")
+        y_position -= 15
+        p.drawString(50, y_position, f"Customer Growth: {analysis.customerAnalytics.customerGrowth:.1f}%")
+        y_position -= 30
+        
+        # Market Analysis
+        p.setFont("Helvetica-Bold", 14)
+        p.drawString(50, y_position, "Market Analysis")
+        y_position -= 25
+        
+        p.setFont("Helvetica", 10)
+        p.drawString(50, y_position, f"Market Size: ${analysis.marketAnalysis.marketSize:,.0f}")
+        y_position -= 15
+        p.drawString(50, y_position, f"Competition: {analysis.marketAnalysis.competition}")
+        y_position -= 15
+        p.drawString(50, y_position, f"Growth Rate: {analysis.marketAnalysis.growthRate:.1f}%")
+        y_position -= 15
+        p.drawString(50, y_position, f"Opportunity Score: {analysis.marketAnalysis.opportunity:.1f}")
+        y_position -= 30
+        
+        # Risk Assessment
+        p.setFont("Helvetica-Bold", 14)
+        p.drawString(50, y_position, "Risk Assessment")
+        y_position -= 25
+        
+        p.setFont("Helvetica", 10)
+        p.drawString(50, y_position, f"Overall Risk Score: {analysis.riskAssessment.overallRiskScore:.1f}/100")
+        y_position -= 15
+        p.drawString(50, y_position, f"Risk Profile: {analysis.riskAssessment.riskProfile}")
+        y_position -= 30
+        
+        # Footer
+        p.setFont("Helvetica", 8)
+        p.drawString(50, 30, "Generated by NexusAI Business Analytics System")
+        p.drawString(width - 150, 30, f"Page 1 of 1")
+        
+        # Finalize PDF
+        p.showPage()
+        p.save()
+        
+        buffer.seek(0)
+        
+        # Return PDF as response
+        pdf_data = buffer.getvalue()
+        buffer.close()
+        
+        return Response(
+            content=pdf_data,
+            media_type="application/pdf",
+            headers={"Content-Disposition": f"attachment; filename=Business_Analysis_Report.pdf"}
+        )
+        
+    except Exception as e:
+        return {"success": False, "error": str(e)}
+
+# Include database router
+app.include_router(database_router)
+
+# Enhanced health check
 @app.get("/api/health")
 def health_check() -> dict:
-    return {"status": "ok", "message": "Backend is running"}
+    return {
+        "status": "ok", 
+        "message": "Backend is running",
+        "ml_predictor": predictor is not None,
+        "version": "0.1.0",
+        "features": {
+            "ml_analysis": predictor is not None,
+            "heuristic_fallback": True,
+            "data_validation": True,
+            "export_functionality": True
+        }
+    }
 
 @app.post("/api/analyze-company", response_model=AnalysisResult)
 def analyze_company(payload: CompanyInput) -> AnalysisResult:
     """
     Analyze company data using ML model or fallback heuristic approach.
     """
-    # Force fallback for testing
     print("=== DEBUG: analyze_company called ===")
+    
+    # Try ML predictor first, fallback to heuristic if not available
+    if predictor is not None:
+        try:
+            print("Using ML predictor...")
+            # Convert payload to dict for ML predictor
+            payload_dict = payload.model_dump()
+            
+            # Get ML prediction
+            ml_result = predictor.predict(payload_dict)
+            
+            # Convert ML result to our format
+            return _convert_ml_result_to_analysis_result(ml_result, payload)
+            
+        except Exception as e:
+            print(f"ML predictor failed, using fallback: {e}")
+    
+    # Fallback to heuristic analysis
+    print("Using heuristic analysis fallback...")
     return _heuristic_analysis(payload)
+
+def _convert_ml_result_to_analysis_result(ml_result: dict, payload: CompanyInput) -> AnalysisResult:
+    """
+    Convert ML predictor result to our AnalysisResult format.
+    """
+    print("Converting ML result to AnalysisResult format...")
+    
+    # Extract basic metrics from ML result
+    business_health = float(ml_result.get('business_health', 75.0))
+    risk_level = ml_result.get('risk_level', 'Medium')
+    failure_probability = float(ml_result.get('failure_probability', 25.0))
+    investment_readiness = ml_result.get('investment_readiness', 'B')
+    
+    # Create summary
+    summary = AnalysisSummary(
+        businessHealth=business_health,
+        riskLevel=risk_level,
+        investmentReadiness=investment_readiness,
+        failureProbability=failure_probability,
+    )
+    
+    # Generate trajectory and predictions
+    revenue = _safe_float(payload.revenue) or 8200000
+    customers = _safe_int(payload.customerCount) or 1500
+    growth = _safe_float(payload.growthRate) or 15.0
+    
+    # Generate trajectory points
+    trajectory = [
+        TrajectoryPoint(month="Now", revenue=revenue/1_000_000, customers=customers, marketShare=2.5),
+        TrajectoryPoint(month="3 Months", revenue=(revenue/1_000_000)*1.15, customers=int(customers*1.2), marketShare=2.8),
+        TrajectoryPoint(month="6 Months", revenue=(revenue/1_000_000)*1.3, customers=int(customers*1.4), marketShare=3.2),
+        TrajectoryPoint(month="12 Months", revenue=(revenue/1_000_000)*1.6, customers=int(customers*1.8), marketShare=3.8),
+        TrajectoryPoint(month="24 Months", revenue=(revenue/1_000_000)*2.2, customers=int(customers*2.5), marketShare=4.5),
+    ]
+    
+    # Generate predictions
+    growth_predictions = []
+    for months, label in [(3, "3 Months"), (6, "6 Months"), (12, "12 Months"), (24, "24 Months")]:
+        t = trajectory[{3: 1, 6: 2, 12: 3, 24: 4}[months]]
+        confidence = max(50.0, min(95.0, business_health - months * 0.6))
+        status = "success" if confidence >= 80 else "warning" if confidence >= 65 else "danger"
+        
+        growth_predictions.append(
+            Prediction(
+                period=label,
+                confidence=round(confidence, 1),
+                status=status,
+                metrics=[
+                    SummaryMetric(
+                        label="Revenue",
+                        value=f"${t.revenue:.1f}M",
+                        positive=True,
+                        change=round((t.revenue / (revenue/1_000_000) - 1) * 100, 1),
+                    ),
+                    SummaryMetric(
+                        label="Customers",
+                        value=f"{t.customers:,}",
+                        positive=True,
+                        change=round((t.customers / customers - 1) * 100, 1),
+                    ),
+                ],
+            )
+        )
+    
+    # Generate scenarios
+    scenarios = [
+        ScenarioPoint(period="3 Months", optimistic=trajectory[1].revenue*1.1, baseline=trajectory[1].revenue, conservative=trajectory[1].revenue*0.9),
+        ScenarioPoint(period="6 Months", optimistic=trajectory[2].revenue*1.1, baseline=trajectory[2].revenue, conservative=trajectory[2].revenue*0.9),
+        ScenarioPoint(period="12 Months", optimistic=trajectory[3].revenue*1.1, baseline=trajectory[3].revenue, conservative=trajectory[3].revenue*0.9),
+        ScenarioPoint(period="24 Months", optimistic=trajectory[4].revenue*1.1, baseline=trajectory[4].revenue, conservative=trajectory[4].revenue*0.9),
+    ]
+    
+    # Generate analytics using existing functions
+    customer_analytics = _generate_customer_analytics(payload, business_health)
+    market_analysis = _generate_market_analysis(payload, business_health)
+    financial_analysis = _generate_financial_analysis(payload, business_health)
+    risk_assessment = _generate_risk_assessment(payload, business_health)
+    
+    return AnalysisResult(
+        input=payload,
+        summary=summary,
+        growthPredictions=growth_predictions,
+        trajectory=trajectory,
+        scenarios=scenarios,
+        customerAnalytics=customer_analytics,
+        marketAnalysis=market_analysis,
+        financialAnalysis=financial_analysis,
+        riskAssessment=risk_assessment,
+    )
 
 def _safe_float(value: str, default: float = 0.0) -> float:
     try:

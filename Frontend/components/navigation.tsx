@@ -25,8 +25,8 @@ import { Button } from "@/components/ui/button"
 
 const navItems = [
   { href: "/", label: "Home", icon: Home },
-  { href: "/company-input", label: "Company Input", icon: Building2 },
   { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
+  { href: "/company-input", label: "Company Input", icon: Building2 },
   { href: "/predictions", label: "Predictions", icon: TrendingUp },
   { href: "/customer-analytics", label: "Customers", icon: Users },
   { href: "/market-analysis", label: "Market", icon: Globe },
@@ -43,52 +43,40 @@ export function Navigation() {
 
   return (
     <>
-      {/* Desktop Sidebar */}
+      {/* Enhanced Desktop Sidebar */}
       <aside
         className={cn(
           "sticky left-0 top-0 h-screen z-50 hidden lg:flex flex-col transition-all duration-300 ease-in-out",
-          collapsed ? "w-16" : "w-48"
+          collapsed ? "w-16" : "w-56"
         )}
       >
-        {/* Animated background glow */}
+        {/* Enhanced Animated background */}
         <div className="absolute inset-0 bg-[#0A0F1E]/95 backdrop-blur-xl overflow-hidden border-r border-white/5">
-          {/* Floating orbs */}
-          <div className="absolute top-20 left-4 w-32 h-32 bg-primary/5 rounded-full blur-3xl animate-orb-float" />
-          <div className="absolute bottom-40 right-0 w-24 h-24 bg-accent/5 rounded-full blur-2xl animate-orb-float" style={{ animationDelay: '1s' }} />
+          {/* Enhanced floating orbs */}
+          <div className="absolute top-20 left-4 w-40 h-40 bg-primary/8 rounded-full blur-3xl animate-orb-float" />
+          <div className="absolute bottom-32 right-0 w-32 h-32 bg-accent/8 rounded-full blur-2xl animate-orb-float" style={{ animationDelay: '1.5s' }} />
+          <div className="absolute top-1/2 left-1/2 w-24 h-24 bg-gradient-to-br from-primary/20 to-accent/20 rounded-full blur-xl animate-pulse" style={{ animationDelay: '0.8s' }} />
           
-          {/* Animated light line on the right edge */}
+          {/* Enhanced animated light line on right edge */}
           <div className="absolute right-0 top-0 w-px h-full overflow-hidden">
-            <div className="h-20 w-full bg-gradient-to-b from-transparent via-primary to-transparent animate-border-light" 
-                 style={{ position: 'absolute', top: '0%' }} />
+            <div className="h-full w-full bg-gradient-to-b from-transparent via-primary/30 to-transparent animate-border-light" 
+                 style={{ position: 'absolute', top: '0%', animationDuration: '3s' }} />
+            <div className="h-full w-full bg-gradient-to-b from-transparent via-accent/20 to-transparent animate-border-light" 
+                 style={{ position: 'absolute', top: '0%', animationDelay: '1.5s', animationDuration: '3s' }} />
           </div>
         </div>
 
-
-
         {/* Content */}
         <div className="relative z-10 flex flex-col h-full">
-          {/* Logo */}
+          {/* Logo Section - Completely Removed */}
           <div className={cn(
-            "flex items-center h-14 px-4 border-b border-white/5",
+            "flex items-center h-16 px-4 border-b border-white/10",
             collapsed ? "justify-center" : "gap-3"
           )}>
-            <div className="relative group">
-              {/* Logo glow effect */}
-              <div className="absolute inset-0 bg-gradient-to-br from-primary to-accent rounded-xl blur-lg opacity-50 group-hover:opacity-80 transition-opacity animate-pulse-glow" />
-              <div className="relative w-10 h-10 rounded-xl bg-gradient-to-br from-primary to-accent flex items-center justify-center">
-                <BarChart3 className="w-6 h-6 text-primary-foreground" />
-              </div>
-            </div>
-            {!collapsed && (
-              <div className="flex flex-col">
-                <span className="font-bold text-foreground gradient-text">BAPS</span>
-                <span className="text-[10px] text-muted-foreground">Business Analysis</span>
-              </div>
-            )}
           </div>
 
-          {/* Navigation Items */}
-          <nav className="flex-1 py-6 px-3 space-y-1 overflow-y-auto scrollbar-none [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
+          {/* Enhanced Navigation Items */}
+          <nav className="flex-1 py-6 px-3 space-y-2 overflow-y-auto scrollbar-none [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
             {navItems.map((item, index) => {
               const Icon = item.icon
               const isActive = pathname === item.href
@@ -97,56 +85,45 @@ export function Navigation() {
                   key={item.href}
                   href={item.href}
                   className={cn(
-                    "group relative flex items-center gap-3 px-3 py-3 rounded-xl text-sm transition-all duration-300",
-                    collapsed && "justify-center px-2",
+                    "group relative flex items-center gap-3 px-3 py-3 rounded-2xl text-sm font-medium transition-all duration-300 hover:scale-105",
+                    collapsed && "justify-center px-2 py-2",
                     isActive
-                      ? "text-primary"
+                      ? "text-primary shadow-lg"
                       : "text-muted-foreground hover:text-foreground"
                   )}
                   style={{ animationDelay: `${index * 0.05}s` }}
                 >
-                  {/* Active/Hover background with glow */}
+                  {/* Simplified Active/Hover background - removed blue colors */}
                   <div className={cn(
-                    "absolute inset-0 rounded-xl transition-all duration-300",
+                    "absolute inset-0 rounded-2xl transition-all duration-300",
                     isActive 
-                      ? "bg-gradient-to-r from-primary/20 via-primary/10 to-transparent border border-primary/30 shadow-[0_0_25px_rgba(6,182,212,0.25),inset_0_1px_1px_rgba(255,255,255,0.1)]" 
-                      : "bg-transparent group-hover:bg-gradient-to-r group-hover:from-secondary/60 group-hover:to-secondary/30 group-hover:border group-hover:border-border/50"
+                      ? "bg-gray-800/20 border border-gray-600/40" 
+                      : "bg-transparent group-hover:bg-gray-700/10 group-hover:border-gray-600/30"
                   )}>
-                    {/* Inner glow for active state */}
+                    {/* Simplified inner glow for active state */}
                     {isActive && (
-                      <div className="absolute inset-0 rounded-xl bg-gradient-to-r from-primary/5 to-transparent" />
+                      <div className="absolute inset-0 rounded-2xl bg-gray-700/10" />
                     )}
-                    {/* Shimmer effect on hover */}
-                    {!isActive && (
-                      <div className="absolute inset-0 rounded-xl overflow-hidden opacity-0 group-hover:opacity-100 transition-opacity">
-                        <div className="absolute inset-0 -translate-x-full group-hover:translate-x-full transition-transform duration-700 bg-gradient-to-r from-transparent via-white/5 to-transparent" />
-                      </div>
-                    )}
+                    {/* Removed shimmer effect */}
                   </div>
 
-                  {/* Active indicator light */}
-                  {isActive && (
-                    <div className="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-8 rounded-r-full bg-gradient-to-b from-primary to-accent shadow-[0_0_12px_rgba(6,182,212,0.8)]" />
-                  )}
-
+                  {/* Simplified Icon - removed blue colors */}
                   <Icon className={cn(
                     "relative z-10 w-5 h-5 transition-all duration-300",
-                    isActive && "scale-110 drop-shadow-[0_0_8px_rgba(6,182,212,0.6)]",
                     !collapsed && "group-hover:scale-110"
                   )} />
-                  
+                   
                   {!collapsed && (
                     <span className={cn(
-                      "relative z-10 font-medium transition-all duration-300",
-                      isActive && "drop-shadow-[0_0_8px_rgba(6,182,212,0.4)]"
+                      "relative z-10 font-medium transition-all duration-300"
                     )}>{item.label}</span>
                   )}
 
-                  {/* Tooltip for collapsed state */}
+                  {/* Enhanced Tooltip for collapsed state */}
                   {collapsed && (
-                    <div className="absolute left-full ml-2 px-3 py-2 rounded-lg bg-card border border-border text-sm font-medium opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 whitespace-nowrap z-50 shadow-xl">
+                    <div className="absolute left-full ml-3 px-3 py-2 rounded-xl bg-card/95 backdrop-blur-xl border border-border/80 text-sm font-medium opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 whitespace-nowrap z-50 shadow-2xl">
                       {item.label}
-                      <div className="absolute left-0 top-1/2 -translate-x-1 -translate-y-1/2 w-2 h-2 bg-card border-l border-b border-border rotate-45" />
+                      <div className="absolute left-0 top-1/2 -translate-x-1 -translate-y-1/2 w-2 h-2 bg-card/95 border-l border-b border-border rotate-45" />
                     </div>
                   )}
                 </Link>
@@ -154,47 +131,24 @@ export function Navigation() {
             })}
           </nav>
 
-          {/* CTA Button */}
-          <div className={cn("p-4 border-t border-border/50", collapsed && "px-2")}>
-            <Link href="/company-input">
-              <Button className={cn(
-                "relative w-full overflow-hidden bg-gradient-to-r from-primary to-accent text-primary-foreground font-semibold transition-all hover:shadow-[0_0_30px_rgba(6,182,212,0.4)]",
-                collapsed && "px-0"
-              )}>
-                {/* Button shimmer effect */}
-                <div className="absolute inset-0 overflow-hidden">
-                  <div className="absolute inset-0 -translate-x-full hover:translate-x-full transition-transform duration-1000 bg-gradient-to-r from-transparent via-white/20 to-transparent animate-shimmer" />
-                </div>
-                <span className="relative z-10">
-                  {collapsed ? <TrendingUp className="w-5 h-5" /> : "Start Analysis"}
-                </span>
-              </Button>
-            </Link>
+          {/* Simplified CTA Section - Removed Button */}
+          <div className={cn("p-4 border-t border-border/60", collapsed && "px-2")}>
           </div>
 
-          {/* Collapse Toggle */}
+          {/* Simplified Collapse Toggle */}
           <button
             onClick={() => setCollapsed(!collapsed)}
-            className="absolute -right-3 top-20 w-6 h-6 rounded-full bg-card border border-border flex items-center justify-center text-muted-foreground hover:text-foreground hover:bg-secondary transition-colors shadow-lg"
+            className="absolute -right-3 top-20 w-6 h-6 rounded-full bg-card border border-border flex items-center justify-center text-muted-foreground hover:text-foreground hover:bg-secondary transition-colors"
           >
             {collapsed ? <ChevronRight className="w-3 h-3" /> : <ChevronLeft className="w-3 h-3" />}
           </button>
         </div>
       </aside>
 
-      {/* Mobile Header */}
+      {/* Mobile Header - Logo Removed */}
       <header className="fixed top-0 left-0 right-0 z-50 lg:hidden bg-[#0A0F1E]/95 backdrop-blur-xl border-b border-white/5">
         <div className="flex items-center justify-between h-14 px-4">
-          <Link href="/" className="flex items-center gap-2">
-            <div className="relative">
-              <div className="absolute inset-0 bg-gradient-to-br from-primary to-accent rounded-lg blur-md opacity-50" />
-              <div className="relative w-8 h-8 rounded-lg bg-gradient-to-br from-primary to-accent flex items-center justify-center">
-                <BarChart3 className="w-5 h-5 text-primary-foreground" />
-              </div>
-            </div>
-            <span className="font-bold gradient-text">BAPS</span>
-          </Link>
-          
+             
           <button
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
             className="p-2 rounded-lg hover:bg-secondary/50 transition-colors"

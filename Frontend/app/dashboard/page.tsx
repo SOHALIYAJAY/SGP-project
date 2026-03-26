@@ -4,6 +4,8 @@ import React, { useState, useEffect } from "react"
 import { MetricCard } from "@/components/ui/metric-card"
 import { SectionWrapper } from "@/components/ui/section-wrapper"
 import { useExportPDF } from "@/hooks/use-export-pdf"
+import { useCompanyData } from "@/hooks/useCompanyData"
+import { FillCompanyFirst } from "@/components/ui/fill-company-first"
 import { GlowCard } from "@/components/ui/spotlight-card";
 import { DashboardGlowCard } from "@/components/ui/dashboard-glow-card";
 import { CustomTooltip } from "@/components/ui/custom-tooltip"
@@ -48,15 +50,80 @@ import {
 } from "recharts"
 import ChartInsight from '@/components/chart-insight'
 import CustomerStabilityInfo from '@/components/ui/customer-stability-info'
-import SGPStatusCard from '@/components/ui/sgp-status-card'
+import { SimpleStatusCard } from '@/components/ui/simple-status-card'
 
 export default function DashboardPage() {
   const [analysisData, setAnalysisData] = useState<any>(null)
   const [loading, setLoading] = useState(true)
+  const { hasCompanyData, isLoading: companyDataLoading } = useCompanyData()
   const { isExporting, handleExport } = useExportPDF(
     "dashboard-content",
     "Business_Analysis_Report.pdf",
+    "Business Analysis Dashboard",
+    analysisData?.input?.companyName || "Company"
   )
+
+  // Simple backend export function
+  const handleSimpleExport = async () => {
+    try {
+      console.log("Starting PDF export from backend...")
+      
+      // Get company data from localStorage
+      const storedData = localStorage.getItem('companyAnalysisData')
+      const companyData = storedData ? JSON.parse(storedData) : {}
+      
+      // Call backend API for PDF generation
+      const response = await fetch('http://localhost:8000/api/export-pdf', {
+        method: 'POST',
+        headers: { 
+          'Content-Type': 'application/json',
+          'Accept': 'application/pdf'
+        },
+        body: JSON.stringify(companyData)
+      })
+      
+      if (!response.ok) {
+        throw new Error(`Backend export failed: ${response.status}`)
+      }
+      
+      // Get PDF blob
+      const blob = await response.blob()
+      
+      console.log("Response blob type:", blob.type)
+      console.log("Response blob size:", blob.size)
+      console.log("Response headers:", response.headers)
+      
+      // Check if it's actually a PDF
+      if (blob.type !== 'application/pdf') {
+        console.warn('Response is not PDF, blob type:', blob.type)
+        const text = await blob.text()
+        console.error('Backend response:', text)
+        throw new Error('Server did not return a PDF file')
+      }
+      
+      console.log("Creating download link...")
+      
+      // Create download link
+      const url = window.URL.createObjectURL(blob)
+      const a = document.createElement('a')
+      a.href = url
+      a.download = "Business_Analysis_Report.pdf"
+      document.body.appendChild(a)
+      a.click()
+      
+      console.log("Download link clicked!")
+      
+      // Cleanup
+      window.URL.revokeObjectURL(url)
+      document.body.removeChild(a)
+      
+      console.log("PDF exported successfully from backend")
+      
+    } catch (error) {
+      console.error("PDF export error:", error)
+      alert("PDF export failed. Please try again.")
+    }
+  }
 
   useEffect(() => {
     // Fetch ML-powered analysis data
@@ -81,7 +148,7 @@ export default function DashboardPage() {
           industryGrowthRate: "25"
         }
 
-        const response = await fetch('/api/analyze-company', {
+        const response = await fetch('http://localhost:8000/api/analyze-company', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(companyData)
@@ -101,7 +168,7 @@ export default function DashboardPage() {
     fetchAnalysisData()
   }, [])
 
-  if (loading) {
+  if (loading || companyDataLoading) {
     return (
       <div className="min-h-screen py-2">
         <SectionWrapper>
@@ -112,6 +179,10 @@ export default function DashboardPage() {
         </SectionWrapper>
       </div>
     )
+  }
+
+  if (!hasCompanyData) {
+    return <FillCompanyFirst />
   }
 
   if (!analysisData) {
@@ -164,9 +235,11 @@ export default function DashboardPage() {
   ]
 
   const performanceMetrics = [
-    { name: "Revenue", value: analysisData.summary.businessHealth, fill: "#06B6D4" },
-    { name: "Growth", value: analysisData.customerAnalytics.customerGrowth, fill: "#22C55E" },
-    { name: "Efficiency", value: analysisData.financialAnalysis.financialHealth, fill: "#F59E0B" },
+    { name: "Revenue Growth", value: analysisData.growthPredictions.revenueGrowth || 75, fill: "#06B6D4" },
+    { name: "Customer Growth", value: analysisData.growthPredictions.customerGrowth || 82, fill: "#22C55E" },
+    { name: "Profit Margin", value: analysisData.financialAnalysis.profitMargin || 65, fill: "#F59E0B" },
+    { name: "Market Share", value: analysisData.marketAnalysis.marketShare || 45, fill: "#8B5CF6" },
+    { name: "NPS Score", value: analysisData.customerAnalytics.nps || 70, fill: "#A855F7" },
     { name: "Stability", value: 100 - analysisData.riskAssessment.overallRiskScore, fill: "#22D3EE" },
   ]
 
@@ -197,7 +270,7 @@ export default function DashboardPage() {
               <p className="text-xs text-success mt-2">🤖 Powered by ML Analysis</p>
             </div>
             <Button
-              onClick={handleExport}
+              onClick={handleSimpleExport}
               disabled={isExporting}
               className="gap-2"
             >
@@ -207,6 +280,7 @@ export default function DashboardPage() {
           </div>
         </div>
 
+        <div id="dashboard-content">
         {/* Key Metrics */}
         <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
           <MetricCard
@@ -236,15 +310,6 @@ export default function DashboardPage() {
             delay={300}
             sparkline={[65,68,72,75,78,analysisData.summary.investmentReadiness.includes("A") ? 90 : analysisData.summary.investmentReadiness.includes("B") ? 75 : 60]}
           />
-          <MetricCard
-            title="Failure Probability"
-            value={`${analysisData.summary.failureProbability.toFixed(1)}%`}
-            subtitle="Risk of failure"
-            icon={ShieldAlert}
-            status={analysisData.summary.failureProbability <= 20 ? "success" : analysisData.summary.failureProbability <= 40 ? "warning" : "danger"}
-            delay={400}
-            sparkline={[45,40,35,30,25,analysisData.summary.failureProbability]}
-          />
         </div>
 
         {/* Main Charts Row */}
@@ -263,6 +328,9 @@ export default function DashboardPage() {
               <h3 className="text-lg font-semibold text-card-foreground">
                 Revenue vs Cost Analysis
               </h3>
+              <p className="text-sm text-muted-foreground">
+                Revenue trends, cost analysis, and profit margin evaluation showing financial health and efficiency.
+              </p>
             </div>
             <div className="h-72">
               <ResponsiveContainer width="100%" height="100%">
@@ -316,8 +384,11 @@ export default function DashboardPage() {
           <div className="glass-card rounded-xl p-6 opacity-0 animate-fade-in-up stagger-6">
             <div className="mb-6">
               <h3 className="text-lg font-semibold text-card-foreground">
-                Customer Stability
+                Customer Analytics
               </h3>
+              <p className="text-sm text-muted-foreground">
+                Customer behavior analysis including retention rates, satisfaction scores, and lifetime value metrics.
+              </p>
             </div>
             <div className="h-48">
               <ResponsiveContainer width="100%" height="100%">
@@ -360,13 +431,16 @@ export default function DashboardPage() {
                 title="Revenue Growth"
                 level="High"
                 summary="Exceptional growth trajectory."
-                bullets={["85% month-over-month growth", "ARR on track for $10M+", "MRR consistently expanding"]}
+                bullets={["85% month-over-month growth", "ARR on track for 10M", "MRR consistently expanding"]}
               />
             </div>
             <div className="mb-6">
               <h3 className="text-lg font-semibold text-card-foreground">
                 MRR & ARR Growth
               </h3>
+              <p className="text-sm text-muted-foreground">
+                Monthly Recurring Revenue and Annual Recurring Revenue trends showing growth patterns and revenue predictability.
+              </p>
             </div>
             <div className="h-64">
               <ResponsiveContainer width="100%" height="100%">
@@ -450,6 +524,22 @@ export default function DashboardPage() {
                   <Tooltip content={<CustomTooltip />} />
                 </RadialBarChart>
               </ResponsiveContainer>
+              
+              {/* Performance Metrics Description */}
+              <div className="mt-4 p-4 bg-card/50 rounded-lg">
+                <h4 className="text-sm font-semibold text-card-foreground mb-2">Performance Analysis</h4>
+                <div className="grid grid-cols-2 gap-4 text-xs">
+                  {performanceMetrics.map((metric: any, index: number) => (
+                    <div key={index} className="flex items-center gap-2">
+                      <div className="w-3 h-3 rounded-full" style={{ backgroundColor: metric.fill }}></div>
+                      <span className="text-muted-foreground">{metric.name}: {metric.value}%</span>
+                    </div>
+                  ))}
+                </div>
+                <p className="text-xs text-muted-foreground mt-3">
+                  Comprehensive performance metrics showing revenue growth, customer acquisition, profitability, market position, and customer satisfaction.
+                </p>
+              </div>
             </div>
           </div>
         </div>
@@ -460,29 +550,32 @@ export default function DashboardPage() {
             <h3 className="text-lg font-semibold text-card-foreground">
               Risk Distribution
             </h3>
+            <p className="text-sm text-muted-foreground">
+              Risk assessment across financial, operational, market, regulatory, and dependency factors.
+            </p>
           </div>
           <div className="h-64">
             <ResponsiveContainer width="100%" height="100%">
               <RadarChart data={riskDistributionData}>
                 <defs>
                   <linearGradient id="colorFinancial" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="5%" stopColor="#06B6D4" stopOpacity={0.8} stopColor="#06B6D4" />
+                    <stop offset="5%" stopColor="#06B6D4" stopOpacity={0.8} />
                     <stop offset="95%" stopColor="#06B6D4" stopOpacity={0.1} />
                   </linearGradient>
                   <linearGradient id="colorOperational" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="5%" stopColor="#22C55E" stopOpacity={0.8} stopColor="#22C55E" />
+                    <stop offset="5%" stopColor="#22C55E" stopOpacity={0.8} />
                     <stop offset="95%" stopColor="#22C55E" stopOpacity={0.1} />
                   </linearGradient>
                   <linearGradient id="colorMarket" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="5%" stopColor="#22D3EE" stopOpacity={0.8} stopColor="#22D3EE" />
+                    <stop offset="5%" stopColor="#22D3EE" stopOpacity={0.8} />
                     <stop offset="95%" stopColor="#22D3EE" stopOpacity={0.1} />
                   </linearGradient>
                   <linearGradient id="colorRegulatory" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="5%" stopColor="#F59E0B" stopOpacity={0.8} stopColor="#F59E0B" />
+                    <stop offset="5%" stopColor="#F59E0B" stopOpacity={0.8} />
                     <stop offset="95%" stopColor="#F59E0B" stopOpacity={0.1} />
                   </linearGradient>
                   <linearGradient id="colorDependency" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="5%" stopColor="#EF4444" stopOpacity={0.8} stopColor="#EF4444" />
+                    <stop offset="5%" stopColor="#EF4444" stopOpacity={0.8} />
                     <stop offset="95%" stopColor="#EF4444" stopOpacity={0.1} />
                   </linearGradient>
                 </defs>
@@ -513,16 +606,16 @@ export default function DashboardPage() {
         </div>
 
         {/* Status Cards */}
-        <div className="grid md:grid-cols-3 gap-6 mb-8 opacity-0 animate-fade-in-up stagger-8">
-          <SGPStatusCard
+        <div className="grid md:grid-cols-3 gap-6 mb-8 opacity-0 animate-fade-in-up stagger-8" style={{ display: isExporting ? 'none' : 'grid' }}>
+          <SimpleStatusCard
             title="Key Strength"
             description="Strong revenue growth with improving profit margins"
-            metrics={["Revenue +85% MoM", "Profit margin expanding", "Customer retention high"]}
+            metrics={["Revenue 85% MoM", "Profit margin expanding", "Customer retention high"]}
             status="success"
             icon={TrendingUp}
             delay={900}
           />
-          <SGPStatusCard
+          <SimpleStatusCard
             title="Needs Attention"
             description="Customer churn rate slightly elevated"
             metrics={["Churn at 2.5%", "Focus on retention", "Improve onboarding"]}
@@ -530,14 +623,15 @@ export default function DashboardPage() {
             icon={AlertCircle}
             delay={1000}
           />
-          <SGPStatusCard
+          <SimpleStatusCard
             title="Risk Factor"
             description="Burn rate indicates 18-month runway"
             metrics={["18 months runway", "Plan Series B", "Optimize costs"]}
-            status="danger"
+            status="risk"
             icon={AlertTriangle}
             delay={1100}
           />
+        </div>
         </div>
       </SectionWrapper>
     </div>

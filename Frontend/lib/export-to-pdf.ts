@@ -35,11 +35,36 @@ export async function exportToPDF(
         // Remove @supports rules with oklab in the cloned document
         const styles = clonedDocument.querySelectorAll("style")
         styles.forEach((style) => {
-          if (style.textContent && style.textContent.includes("oklab")) {
+          if (style.textContent) {
+            // Remove @supports rules with oklab
             style.textContent = style.textContent.replace(
               /@supports\s*\([^)]*oklab[^)]*\)\s*\{[^}]*\}/g,
               ""
             )
+            // Remove oklab() color functions
+            style.textContent = style.textContent.replace(
+              /oklab\([^)]*\)/g,
+              "#3b82f6"
+            )
+            // Remove color-mix() with oklab
+            style.textContent = style.textContent.replace(
+              /color-mix\(.*?oklab[^)]*\)/g,
+              "#3b82f6"
+            )
+            // Remove any remaining oklab references
+            style.textContent = style.textContent.replace(/oklab/g, "")
+          }
+        })
+        
+        // Also remove inline styles with oklab
+        const elements = clonedDocument.querySelectorAll("*")
+        elements.forEach((el) => {
+          const element = el as HTMLElement
+          if (element.style && element.style.color) {
+            element.style.color = element.style.color.replace(/oklab\([^)]*\)/g, "#3b82f6")
+          }
+          if (element.style && element.style.backgroundColor) {
+            element.style.backgroundColor = element.style.backgroundColor.replace(/oklab\([^)]*\)/g, "#0F172A")
           }
         })
       },
@@ -98,9 +123,7 @@ export async function exportToPDF(
           contentWidth,
           remainingHeight,
           undefined,
-          "FAST",
-          0,
-          imgYOffset
+          "FAST"
         )
         remainingHeight = 0
       } else {

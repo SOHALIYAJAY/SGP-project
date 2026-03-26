@@ -37,6 +37,12 @@ export function SGPStatusCard({
   className,
 }: SGPStatusCardProps) {
   const mapping = STATUS_MAP[status]
+  
+  // Handle undefined mapping gracefully
+  if (!mapping) {
+    console.warn(`Invalid status "${status}" provided to SGPStatusCard`)
+    return null
+  }
 
   // set CSS variables for Tailwind arbitrary utilities
   const rootStyle: React.CSSProperties = {

@@ -1,10 +1,10 @@
 import React from "react"
-
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { AnimatedCounter } from "@/components/ui/animated-counter"
 import { Typewriter } from "@/components/ui/typewriter";
 import RainAnimation from "@/components/rain-animation"
+import DatabaseStats from "@/components/DatabaseStats"
 
 import {
   ArrowRight,
@@ -37,16 +37,16 @@ export default function HomePage() {
             {/* Badge */}
             <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full glass text-sm text-muted-foreground mb-8 opacity-0 animate-fade-in-up">
               <Zap className="w-4 h-4 text-primary" />
-              <span>AI-Powered Business Intelligence</span>
+              <span>NexusAI - Intelligent Business Analytics</span>
             </div>
 
             {/* Main Heading */}
             <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold tracking-tight text-foreground mb-6 opacity-0 animate-fade-in-up stagger-1">
-            Business Analysis &{" "}
+            NexusAI &{" "}
             <Typewriter
               text={[
-                "Prediction System",
-                "Growth Forecasting",
+                "Intelligent Analytics",
+                "Growth Forecasting", 
                 "Smart Business Insights",
                 "AI-Driven Decisions",
               ]}
@@ -69,44 +69,85 @@ export default function HomePage() {
                   <ArrowRight className="ml-2 w-4 h-4 group-hover:translate-x-1 transition-transform" />
                 </Button>
               </Link>
-              <Link href="/dashboard">
+              <Link href="/predictions">
                 <Button size="lg" variant="outline" className="border-cyan-500/30 hover:bg-cyan-500/5 px-8 bg-transparent text-foreground hover:text-cyan-400 transition-colors">
-                  View Demo Dashboard
+                  View Predictions
                 </Button>
               </Link>
             </div>
           </div>
 
           {/* Stats Section */}
-          <div className="mt-20 grid grid-cols-2 md:grid-cols-4 gap-6 max-w-4xl mx-auto">
-            <StatCard
-              value={97.8}
-              suffix="%"
-              label="Prediction Accuracy"
-              color="success"
-              delay={400}
-            />
-            <StatCard
-              value={2500}
-              suffix="+"
-              label="Reports Generated"
-              color="info"
-              delay={500}
-            />
-            <StatCard
-              value={150}
-              suffix="+"
-              label="Data Points Analyzed"
-              color="info"
-              delay={600}
-            />
-            <StatCard
-              value={24}
-              suffix="/7"
-              label="Real-time Monitoring"
-              color="success"
-              delay={700}
-            />
+          <DatabaseStats />
+        </div>
+      </section>
+
+      {/* Data Validation Section */}
+      <section className="py-16 bg-gradient-to-b from-red-50 to-orange-50 dark:from-red-950/20 dark:to-orange-950/20">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-12 opacity-0 animate-fade-in-up">
+            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-red-100 dark:bg-red-900/50 text-red-800 dark:text-red-200 text-sm font-semibold mb-6">
+              <div className="w-2 h-2 rounded-full bg-red-500 animate-pulse" />
+              <span>🚨 ADD DATA VALIDATION (VERY IMPORTANT)</span>
+            </div>
+            <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-4">
+              Data Validation
+            </h2>
+            <p className="text-muted-foreground max-w-2xl mx-auto">
+              Real-time consistency checks for accurate business analysis
+            </p>
+          </div>
+
+          <div className="grid md:grid-cols-3 gap-8">
+            <div className="glass-card p-6 rounded-2xl opacity-0 animate-fade-in-up" style={{ animationDelay: "100ms" }}>
+              <div className="flex items-center mb-4">
+                <div className="w-12 h-12 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center text-white font-bold text-lg">
+                  <CheckCircle2 className="w-6 h-6" />
+                </div>
+                <div className="ml-4">
+                  <h3 className="text-xl font-semibold text-foreground">Expected Revenue</h3>
+                  <p className="text-sm text-muted-foreground">ARPU × Customers</p>
+                </div>
+              </div>
+              <div className="text-3xl font-bold text-primary mb-2">$10,000,000</div>
+              <p className="text-sm text-muted-foreground">Calculated from customer metrics</p>
+            </div>
+
+            <div className="glass-card p-6 rounded-2xl opacity-0 animate-fade-in-up" style={{ animationDelay: "200ms" }}>
+              <div className="flex items-center mb-4">
+                <div className="w-12 h-12 rounded-full bg-gradient-to-br from-green-500 to-emerald-600 flex items-center justify-center text-white font-bold text-lg">
+                  <TrendingUp className="w-6 h-6" />
+                </div>
+                <div className="ml-4">
+                  <h3 className="text-xl font-semibold text-foreground">Reported Revenue</h3>
+                  <p className="text-sm text-muted-foreground">Actual company revenue</p>
+                </div>
+              </div>
+              <div className="text-3xl font-bold text-green-600 mb-2">$12,000,000</div>
+              <p className="text-sm text-muted-foreground">From financial statements</p>
+            </div>
+
+            <div className="glass-card p-6 rounded-2xl opacity-0 animate-fade-in-up" style={{ animationDelay: "300ms" }}>
+              <div className="flex items-center mb-4">
+                <div className="w-12 h-12 rounded-full bg-gradient-to-br from-amber-500 to-orange-600 flex items-center justify-center text-white font-bold text-lg">
+                  <Shield className="w-6 h-6" />
+                </div>
+                <div className="ml-4">
+                  <h3 className="text-xl font-semibold text-foreground">Validation Status</h3>
+                  <p className="text-sm text-muted-foreground">Data consistency check</p>
+                </div>
+              </div>
+              <div className="flex items-center justify-center mb-2">
+                <div className="w-3 h-3 rounded-full bg-amber-500 animate-pulse" />
+                <span className="ml-3 text-xl font-bold text-amber-600">INCONSISTENT</span>
+              </div>
+              <p className="text-sm text-muted-foreground">17% variance detected</p>
+              <div className="mt-4 p-3 bg-amber-100 dark:bg-amber-900/50 rounded-lg">
+                <p className="text-sm text-amber-800 dark:text-amber-200">
+                  <strong>Action Required:</strong> Verify revenue data or customer metrics
+                </p>
+              </div>
+            </div>
           </div>
         </div>
       </section>
@@ -170,34 +211,6 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* Video Demo Section */}
-      <section className="py-20">
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-12 opacity-0 animate-fade-in-up">
-            <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-4">
-              See BAPS in Action
-            </h2>
-            <p className="text-muted-foreground max-w-2xl mx-auto">
-              Watch how to input your company data and explore powerful analytics features
-            </p>
-          </div>
-
-          <div className="opacity-0 animate-fade-in-up" style={{ animationDelay: "200ms" }}>
-            <div className="relative rounded-2xl overflow-hidden glass-card p-2">
-              <div className="aspect-video bg-secondary/30 rounded-xl overflow-hidden">
-                <iframe 
-                  className="w-full h-full"
-                  src="https://www.youtube.com/embed/dQw4w9WgXcQ"
-                  title="BAPS Demo Video"
-                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                  allowFullScreen
-                ></iframe>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
       {/* How It Works Section */}
       <section className="py-20 pb-12">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -210,9 +223,9 @@ export default function HomePage() {
             </p>
           </div>
 
-          <div className="grid md:grid-cols-3 gap-8">
+          <div className="grid md:grid-cols-3 gap-12">
             <div className="text-center opacity-0 animate-fade-in-up" style={{ animationDelay: "100ms" }}>
-              <div className="w-16 h-16 rounded-full bg-gradient-to-br from-primary to-accent flex items-center justify-center mx-auto mb-4 text-2xl font-bold text-primary-foreground">
+              <div className="w-20 h-20 rounded-full bg-gradient-to-br from-primary to-accent flex items-center justify-center mx-auto mb-6 text-2xl font-bold text-primary-foreground shadow-2xl">
                 1
               </div>
               <h3 className="text-xl font-semibold text-foreground mb-2">Input Your Data</h3>
@@ -222,7 +235,7 @@ export default function HomePage() {
             </div>
 
             <div className="text-center opacity-0 animate-fade-in-up" style={{ animationDelay: "200ms" }}>
-              <div className="w-16 h-16 rounded-full bg-gradient-to-br from-primary to-accent flex items-center justify-center mx-auto mb-4 text-2xl font-bold text-primary-foreground">
+              <div className="w-20 h-20 rounded-full bg-gradient-to-br from-primary to-accent flex items-center justify-center mx-auto mb-6 text-2xl font-bold text-primary-foreground shadow-2xl">
                 2
               </div>
               <h3 className="text-xl font-semibold text-foreground mb-2">AI Analysis</h3>
@@ -232,7 +245,7 @@ export default function HomePage() {
             </div>
 
             <div className="text-center opacity-0 animate-fade-in-up" style={{ animationDelay: "300ms" }}>
-              <div className="w-16 h-16 rounded-full bg-gradient-to-br from-primary to-accent flex items-center justify-center mx-auto mb-4 text-2xl font-bold text-primary-foreground">
+              <div className="w-20 h-20 rounded-full bg-gradient-to-br from-primary to-accent flex items-center justify-center mx-auto mb-6 text-2xl font-bold text-primary-foreground shadow-2xl">
                 3
               </div>
               <h3 className="text-xl font-semibold text-foreground mb-2">Get Insights</h3>
@@ -243,42 +256,92 @@ export default function HomePage() {
           </div>
         </div>
       </section>
+
+      {/* Testimonials Section */}
+      <section className="py-20 bg-card/20">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-16 opacity-0 animate-fade-in-up">
+            <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-4">
+              Trusted by Leading Companies
+            </h2>
+            <p className="text-muted-foreground max-w-2xl mx-auto">
+              See what businesses are saying about NexusAI
+            </p>
+          </div>
+
+          <div className="grid md:grid-cols-3 gap-8">
+            <div className="glass-card p-6 rounded-2xl opacity-0 animate-fade-in-up" style={{ animationDelay: "100ms" }}>
+              <div className="flex items-center mb-4">
+                <div className="w-12 h-12 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center text-white font-bold text-lg">
+                  TC
+                </div>
+                <div className="ml-4">
+                  <h3 className="text-xl font-semibold text-foreground">TechCorp</h3>
+                  <div className="flex items-center gap-1">
+                    {[...Array(5)].map((_, i) => (
+                      <div key={i} className="w-2 h-2 rounded-full bg-yellow-400" />
+                    ))}
+                  </div>
+                </div>
+              </div>
+              <p className="text-muted-foreground italic">
+                "NexusAI transformed our decision-making process. The AI insights are incredibly accurate and have helped us reduce risks by 40%."
+              </p>
+              <div className="mt-4">
+                <span className="font-semibold text-primary">CEO, Sarah Johnson</span>
+              </div>
+            </div>
+
+            <div className="glass-card p-6 rounded-2xl opacity-0 animate-fade-in-up" style={{ animationDelay: "200ms" }}>
+              <div className="flex items-center mb-4">
+                <div className="w-12 h-12 rounded-full bg-gradient-to-br from-green-500 to-emerald-600 flex items-center justify-center text-white font-bold text-lg">
+                  FS
+                </div>
+                <div className="ml-4">
+                  <h3 className="text-xl font-semibold text-foreground">FinanceStream</h3>
+                  <div className="flex items-center gap-1">
+                    {[...Array(5)].map((_, i) => (
+                      <div key={i} className="w-2 h-2 rounded-full bg-yellow-400" />
+                    ))}
+                  </div>
+                </div>
+              </div>
+              <p className="text-muted-foreground italic">
+                "The predictive accuracy is remarkable. We've made better investment decisions using NexusAI insights."
+              </p>
+              <div className="mt-4">
+                <span className="font-semibold text-primary">CTO, Michael Chen</span>
+              </div>
+            </div>
+
+            <div className="glass-card p-6 rounded-2xl opacity-0 animate-fade-in-up" style={{ animationDelay: "300ms" }}>
+              <div className="flex items-center mb-4">
+                <div className="w-12 h-12 rounded-full bg-gradient-to-br from-orange-500 to-red-600 flex items-center justify-center text-white font-bold text-lg">
+                  DS
+                </div>
+                <div className="ml-4">
+                  <h3 className="text-xl font-semibold text-foreground">DataSync</h3>
+                  <div className="flex items-center gap-1">
+                    {[...Array(5)].map((_, i) => (
+                      <div key={i} className="w-2 h-2 rounded-full bg-yellow-400" />
+                    ))}
+                  </div>
+                </div>
+              </div>
+              <p className="text-muted-foreground italic">
+                "The comprehensive analysis across all business dimensions gives us confidence in our strategic planning."
+              </p>
+              <div className="mt-4">
+                <span className="font-semibold text-primary">Founder, Alex Rivera</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
     </div>
   )
 }
 
-function StatCard({
-  value,
-  suffix = "",
-  label,
-  color = "info",
-  delay = 0,
-}: {
-  value: number
-  suffix?: string
-  label: string
-  color?: "success" | "info" | "warning" | "danger"
-  delay?: number
-}) {
-  const colorClasses = {
-    success: "text-[#22C55E]",
-    info: "text-[#0EA5E9]",
-    warning: "text-[#F59E0B]",
-    danger: "text-[#EF4444]",
-  }
-
-  return (
-    <div
-      className="text-center p-6 rounded-xl glass card-hover opacity-0 animate-fade-in-up"
-      style={{ animationDelay: `${delay}ms` }}
-    >
-      <div className={`text-3xl md:text-4xl font-bold ${colorClasses[color]} mb-2`}>
-        <AnimatedCounter end={value} suffix={suffix} decimals={value % 1 !== 0 ? 1 : 0} />
-      </div>
-      <p className="text-sm text-muted-foreground">{label}</p>
-    </div>
-  )
-}
 
 function FeatureCard({
   icon: Icon,

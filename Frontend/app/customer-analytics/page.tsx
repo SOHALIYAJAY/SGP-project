@@ -2,9 +2,11 @@
 
 import React, { useState, useEffect } from "react"
 import { SectionWrapper } from "@/components/ui/section-wrapper"
+import { AnimatedCounter } from "@/components/ui/animated-counter"
+import { useCompanyData } from "@/hooks/useCompanyData"
+import { FillCompanyFirst } from "@/components/ui/fill-company-first"
 import { MetricCard } from "@/components/ui/metric-card"
 import { ChartInfoIcon } from "@/components/ui/chart-info-icon"
-import { AnimatedCounter } from "@/components/ui/animated-counter"
 import {
   Users,
   UserMinus,
@@ -34,6 +36,7 @@ import ChartInsight from '@/components/chart-insight'
 export default function CustomerAnalyticsPage() {
   const [customerData, setCustomerData] = useState<any>(null)
   const [loading, setLoading] = useState(true)
+  const { hasCompanyData, isLoading: companyDataLoading } = useCompanyData()
 
   useEffect(() => {
     // Fetch ML-powered customer analytics
@@ -50,7 +53,7 @@ export default function CustomerAnalyticsPage() {
           customerCount: "1500"
         }
 
-        const response = await fetch('/api/analyze-company', {
+        const response = await fetch('http://localhost:8000/api/analyze-company', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(companyData)
@@ -70,7 +73,7 @@ export default function CustomerAnalyticsPage() {
     fetchCustomerData()
   }, [])
 
-  if (loading) {
+  if (loading || companyDataLoading) {
     return (
       <div className="min-h-screen py-2">
         <SectionWrapper>
@@ -81,6 +84,10 @@ export default function CustomerAnalyticsPage() {
         </SectionWrapper>
       </div>
     )
+  }
+
+  if (!hasCompanyData) {
+    return <FillCompanyFirst />
   }
 
   if (!customerData) {

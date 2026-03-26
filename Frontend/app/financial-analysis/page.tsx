@@ -2,6 +2,9 @@
 
 import React, { useState, useEffect } from "react"
 import { SectionWrapper } from "@/components/ui/section-wrapper"
+import { AnimatedCounter } from "@/components/ui/animated-counter"
+import { useCompanyData } from "@/hooks/useCompanyData"
+import { FillCompanyFirst } from "@/components/ui/fill-company-first"
 import { MetricCard } from "@/components/ui/metric-card"
 import { ChartInfoIcon } from "@/components/ui/chart-info-icon"
 import {
@@ -52,7 +55,7 @@ export default function FinancialAnalysisPage() {
           growthRate: "85"
         }
 
-        const response = await fetch('/api/analyze-company', {
+        const response = await fetch('http://localhost:8000/api/analyze-company', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(companyData)

@@ -1,0 +1,54 @@
+{
+  "executive_summary": "High-growth company with 40% growth and -25% margins.",
+  "business_health": {
+    "score": 65,
+    "status": "AVERAGE",
+    "reason": "Mixed performance with strong growth but operational challenges."
+  },
+  "financial_insights": [
+    "-25% profit margin",
+    "$12,000,000 annual revenue",
+    "$800,000/month burn rate"
+  ],
+  "customer_insights": [
+    "2,000 customers",
+    "$5,000 ARPU",
+    "8% churn rate"
+  ],
+  "market_position": [
+    "40% growth rate",
+    "3% market share",
+    "25 competitors"
+  ],
+  "risk_analysis": [
+    "Negative margins require attention",
+    "High burn rate needs optimization",
+    "Competitive market environment"
+  ],
+  "key_insights": [
+    "Strong growth indicates market traction",
+    "Negative margins need operational fixes",
+    "Moderate customer base with good ARPU",
+    "High competition requires differentiation",
+    "Cash runway needs monitoring"
+  ],
+  "red_flags": {
+    "critical": [
+      "Negative profit margin indicates losses"
+    ],
+    "moderate": [
+      "High burn rate relative to revenue",
+      "Moderate churn rate"
+    ]
+  },
+  "final_verdict": {
+    "decision": "HOLD",
+    "reason": "Growth potential offset by operational losses and cash burn."
+  },
+  "confidence_level": {
+    "value": "75%",
+    "reason": "Complete data provided with clear metrics."
+  },
+  "data_integrity": "VALID",
+  "analysis_timestamp": "2026-03-25T18:27:42.438510"
+}

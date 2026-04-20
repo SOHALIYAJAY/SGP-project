@@ -1,0 +1,13 @@
+flowchart TD
+  CP[CompanyProfile]
+  FM[FinancialMetrics]
+  CA[CustomerAnalytics]
+  MA[MarketAnalytics]
+  AR[AnalysisResult]
+  CP --> FM
+  CP --> CA
+  CP --> MA
+  CP --> AR
+  FM -.-> AR
+  CA -.-> AR
+  MA -.-> AR

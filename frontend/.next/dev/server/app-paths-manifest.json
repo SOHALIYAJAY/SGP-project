@@ -1,9 +1,7 @@
 {
   "/company-input/page": "app/company-input/page.js",
-  "/customer-analytics/page": "app/customer-analytics/page.js",
   "/dashboard/page": "app/dashboard/page.js",
   "/financial-analysis/page": "app/financial-analysis/page.js",
-  "/market-analysis/page": "app/market-analysis/page.js",
   "/page": "app/page.js",
   "/predictions/page": "app/predictions/page.js"
 }

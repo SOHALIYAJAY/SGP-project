@@ -1,0 +1,13 @@
+{
+  "/_global-error/page": "/_global-error",
+  "/_not-found/page": "/_not-found",
+  "/company-input/page": "/company-input",
+  "/customer-analytics/page": "/customer-analytics",
+  "/dashboard/page": "/dashboard",
+  "/financial-analysis/page": "/financial-analysis",
+  "/investment/page": "/investment",
+  "/market-analysis/page": "/market-analysis",
+  "/page": "/",
+  "/predictions/page": "/predictions",
+  "/risk-assessment/page": "/risk-assessment"
+}

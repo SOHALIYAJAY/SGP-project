@@ -8,6 +8,10 @@ import os
 from datetime import datetime
 import io
 import logging
+import re
+import json
+import math
+from bson import ObjectId
 from dotenv import load_dotenv
 
 # Load environment variables
@@ -610,9 +614,26 @@ async def analyze_company(payload: CompanyInput) -> AnalysisResult:
             print("Using ML predictor...")
             # Convert payload to dict for ML predictor
             payload_dict = payload.model_dump()
+            # Predictor uses float(...) on many fields; empty strings from the form must not reach it
+            _ml_text_fields = {
+                "companyName",
+                "industry",
+                "location",
+                "primaryMarketRegion",
+                "businessModel",
+                "companyStage",
+                "revenueType",
+                "revenueHistory",
+                "foundedYear",
+                "customerTypeMix",
+                "regulatoryExposure",
+            }
+            for _k, _v in list(payload_dict.items()):
+                if _v == "" and _k not in _ml_text_fields:
+                    payload_dict[_k] = 0
 
-            # Get ML prediction
-            ml_result = predictor.predict(payload_dict)
+            # Get ML prediction (BusinessPredictor exposes predict_single_company)
+            ml_result = predictor.predict_single_company(payload_dict)
 
             # Convert ML result to our format
             result = _convert_ml_result_to_analysis_result(ml_result, payload)
@@ -628,22 +649,219 @@ async def analyze_company(payload: CompanyInput) -> AnalysisResult:
     # Save company data and analysis results to database
     try:
         await _save_analysis_to_database(payload, result)
-        print("✅ Analysis saved to database")
-    except Exception as e:
-        print(f"⚠️ Failed to save to database: {e}")
+        logger.info("Analysis and company input saved to MongoDB for %s", payload.companyName or "(unnamed)")
+    except Exception:
+        logger.exception("Failed to save company/analysis to MongoDB (analysis still returned to client)")
 
     return result
+
+
+def _norm_str(v) -> str:
+    if v is None:
+        return ""
+    return str(v).strip()
+
+
+def _norm_opt_str(v) -> str | None:
+    if v is None or v == "":
+        return None
+    if isinstance(v, (int, float)) and not isinstance(v, bool):
+        if isinstance(v, float) and not math.isfinite(v):
+            return None
+        return str(int(v)) if isinstance(v, float) and v == int(v) else str(v)
+    s = str(v).strip()
+    return s if s else None
+
+
+def _norm_opt_float(v) -> float | None:
+    if v is None or v == "":
+        return None
+    if isinstance(v, bool):
+        return None
+    if isinstance(v, (int, float)):
+        f = float(v)
+        return f if math.isfinite(f) else None
+    try:
+        f = float(str(v).strip().replace(",", ""))
+        return f if math.isfinite(f) else None
+    except ValueError:
+        return None
+
+
+def _norm_opt_int(v) -> int | None:
+    if v is None or v == "":
+        return None
+    if isinstance(v, bool):
+        return None
+    if isinstance(v, int):
+        return v
+    if isinstance(v, float):
+        if not math.isfinite(v):
+            return None
+        return int(v)
+    try:
+        return int(float(str(v).strip()))
+    except ValueError:
+        return None
+
+
+def _norm_customer_type_mix(v) -> dict | None:
+    if v is None or v == "":
+        return None
+    if isinstance(v, dict):
+        return v
+    if isinstance(v, str):
+        s = v.strip()
+        if not s:
+            return None
+        try:
+            parsed = json.loads(s)
+            return parsed if isinstance(parsed, dict) else None
+        except json.JSONDecodeError:
+            return None
+    return None
+
+
+def _norm_revenue_history(v) -> list[float] | None:
+    if v is None or v == "":
+        return None
+    if isinstance(v, list):
+        out: list[float] = []
+        for x in v:
+            xf = _norm_opt_float(x)
+            if xf is not None:
+                out.append(xf)
+        return out if out else None
+    if isinstance(v, str):
+        s = v.strip()
+        if not s:
+            return None
+        try:
+            parsed = json.loads(s)
+            if isinstance(parsed, list):
+                return _norm_revenue_history(parsed)
+        except json.JSONDecodeError:
+            pass
+        parts = [p.strip() for p in s.split(",") if p.strip()]
+        out = []
+        for p in parts:
+            xf = _norm_opt_float(p)
+            if xf is not None:
+                out.append(xf)
+        return out if out else None
+    return None
+
+
+def _normalize_company_snake_for_document(d: dict) -> dict:
+    """Coerce HTTP/form-shaped dict (snake_case) into types CompanyDocument accepts."""
+    float_keys = (
+        "revenue",
+        "expenses",
+        "profit_margin",
+        "burn_rate",
+        "cash_balance",
+        "total_funding",
+        "operational_cost",
+        "market_size",
+        "growth_rate",
+        "market_share",
+        "industry_growth_rate",
+        "arpu",
+        "churn_rate",
+        "customer_satisfaction",
+    )
+    int_keys = (
+        "competitor_count",
+        "team_size",
+        "customer_count",
+        "nps",
+        "founder_experience",
+    )
+    str_opt_keys = (
+        "founded_year",
+        "location",
+        "primary_market_region",
+        "business_model",
+        "company_stage",
+        "revenue_type",
+        "regulatory_exposure",
+    )
+    out: dict = {
+        "company_name": _norm_str(d.get("company_name")),
+        "industry": _norm_str(d.get("industry")),
+        "revenue_history": _norm_revenue_history(d.get("revenue_history")),
+        "customer_type_mix": _norm_customer_type_mix(d.get("customer_type_mix")),
+    }
+    for k in str_opt_keys:
+        out[k] = _norm_opt_str(d.get(k))
+    for k in float_keys:
+        out[k] = _norm_opt_float(d.get(k))
+    for k in int_keys:
+        out[k] = _norm_opt_int(d.get(k))
+    return out
+
+
+def _mongo_insert_document(doc: dict) -> dict:
+    """Ensure _id is a plain bson.ObjectId for PyMongo/Motor."""
+    out = dict(doc)
+    oid = out.get("_id")
+    if oid is not None:
+        out["_id"] = ObjectId(str(oid))
+    return out
+
+
+def _analysis_from_predict_single(ml_result: dict, payload: CompanyInput) -> AnalysisResult:
+    """Map BusinessPredictor.predict_single_company() output to AnalysisResult."""
+    s = ml_result["summary"]
+    business_health = float(s["businessHealth"])
+    summary = AnalysisSummary(
+        businessHealth=business_health,
+        riskLevel=s["riskLevel"],
+        investmentReadiness=s["investmentReadiness"],
+        failureProbability=float(s["failureProbability"]),
+    )
+    growth_predictions = [Prediction(**p) for p in ml_result["growthPredictions"]]
+    trajectory = [TrajectoryPoint(**p) for p in ml_result["trajectory"]]
+    scenarios = [ScenarioPoint(**p) for p in ml_result["scenarios"]]
+    customer_analytics = _generate_customer_analytics(payload, business_health)
+    market_analysis = _generate_market_analysis(payload, business_health)
+    financial_analysis = _generate_financial_analysis(payload, business_health)
+    risk_assessment = _generate_risk_assessment(payload, business_health)
+    return AnalysisResult(
+        input=payload,
+        summary=summary,
+        growthPredictions=growth_predictions,
+        trajectory=trajectory,
+        scenarios=scenarios,
+        customerAnalytics=customer_analytics,
+        marketAnalysis=market_analysis,
+        financialAnalysis=financial_analysis,
+        riskAssessment=risk_assessment,
+    )
+
 
 async def _save_analysis_to_database(payload: CompanyInput, result: AnalysisResult):
     """Save company data and analysis results to MongoDB"""
     from database import companies_collection, analyses_collection
 
-    # Convert CompanyInput to CompanyDocument
-    company_data = payload.model_dump()
-    company_doc = CompanyDocument(**company_data)
+    if companies_collection is None or analyses_collection is None:
+        raise RuntimeError("MongoDB collections are not initialized")
 
-    # Save company data
-    company_result = await companies_collection.insert_one(company_doc.model_dump(by_alias=True))
+    # Convert CompanyInput to CompanyDocument with snake_case field names
+    def _camel_to_snake(name: str) -> str:
+        return re.sub(r'(?<!^)(?=[A-Z])', '_', name).lower()
+
+    company_data = payload.model_dump()
+    company_data_snake = {
+        _camel_to_snake(key): value
+        for key, value in company_data.items()
+    }
+    company_data_snake = _normalize_company_snake_for_document(company_data_snake)
+    company_doc = CompanyDocument(**company_data_snake)
+
+    # Save company data (plain ObjectId for Motor/PyMongo)
+    company_bson = _mongo_insert_document(company_doc.model_dump(by_alias=True, mode="python"))
+    company_result = await companies_collection.insert_one(company_bson)
     company_id = company_result.inserted_id
 
     # Convert AnalysisResult to AnalysisResultDocument
@@ -664,7 +882,9 @@ async def _save_analysis_to_database(payload: CompanyInput, result: AnalysisResu
     )
 
     # Save analysis result
-    await analyses_collection.insert_one(analysis_doc.model_dump(by_alias=True))
+    analysis_bson = _mongo_insert_document(analysis_doc.model_dump(by_alias=True, mode="python"))
+    analysis_bson["company_id"] = ObjectId(str(company_id))
+    await analyses_collection.insert_one(analysis_bson)
 
     # Update database stats
     from database_stats import DatabaseStats
@@ -675,9 +895,16 @@ def _convert_ml_result_to_analysis_result(ml_result: dict, payload: CompanyInput
     """
     Convert ML predictor result to our AnalysisResult format.
     """
-    print("Converting ML result to AnalysisResult format...")
-    
-    # Extract basic metrics from ML result
+    if (
+        isinstance(ml_result, dict)
+        and isinstance(ml_result.get("summary"), dict)
+        and "businessHealth" in ml_result["summary"]
+    ):
+        return _analysis_from_predict_single(ml_result, payload)
+
+    print("Converting ML result to AnalysisResult format (legacy flat shape)...")
+
+    # Extract basic metrics from ML result (legacy flat keys)
     business_health = float(ml_result.get('business_health', 75.0))
     risk_level = ml_result.get('risk_level', 'Medium')
     failure_probability = float(ml_result.get('failure_probability', 25.0))

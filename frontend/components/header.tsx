@@ -4,21 +4,7 @@ import { useState } from "react"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
 import { cn } from "@/lib/utils"
-import {
-  BarChart3,
-  Home,
-  Building2,
-  LayoutDashboard,
-  TrendingUp,
-  Users,
-  Globe,
-  DollarSign,
-  Shield,
-  Lightbulb,
-  PiggyBank,
-  Menu,
-  X,
-} from "lucide-react"
+import { Building2, LayoutDashboard, Lightbulb, Menu, X } from "lucide-react"
 import { Button } from "@/components/ui/button"
 
 const headerNavItems = [

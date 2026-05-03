@@ -140,8 +140,8 @@ export default function HomePage() {
             />
             <FeatureCard
               icon={Brain}
-              title="AI Recommendations"
-              description="Actionable insights prioritized by impact and urgency for your business"
+              title="Strategic Insights"
+              description="Actionable recommendations prioritized by impact and urgency for your business"
               color="ai"
               delay={300}
             />
@@ -166,34 +166,6 @@ export default function HomePage() {
               color="investment"
               delay={600}
             />
-          </div>
-        </div>
-      </section>
-
-      {/* Video Demo Section */}
-      <section className="py-20">
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-12 opacity-0 animate-fade-in-up">
-            <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-4">
-              See BAPS in Action
-            </h2>
-            <p className="text-muted-foreground max-w-2xl mx-auto">
-              Watch how to input your company data and explore powerful analytics features
-            </p>
-          </div>
-
-          <div className="opacity-0 animate-fade-in-up" style={{ animationDelay: "200ms" }}>
-            <div className="relative rounded-2xl overflow-hidden glass-card p-2">
-              <div className="aspect-video bg-secondary/30 rounded-xl overflow-hidden">
-                <iframe 
-                  className="w-full h-full"
-                  src="https://www.youtube.com/embed/dQw4w9WgXcQ"
-                  title="BAPS Demo Video"
-                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                  allowFullScreen
-                ></iframe>
-              </div>
-            </div>
           </div>
         </div>
       </section>

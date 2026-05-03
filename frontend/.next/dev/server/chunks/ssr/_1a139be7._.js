@@ -267,7 +267,9 @@ __turbopack_context__.s([
     "getStoredAnalysis",
     ()=>getStoredAnalysis,
     "setStoredAnalysis",
-    ()=>setStoredAnalysis
+    ()=>setStoredAnalysis,
+    "transformBackendAnalysis",
+    ()=>transformBackendAnalysis
 ]);
 const KEY = "baps:analysis";
 function getStoredAnalysis() {
@@ -280,6 +282,72 @@ function setStoredAnalysis(a) {
     if ("TURBOPACK compile-time truthy", 1) return;
     //TURBOPACK unreachable
     ;
+}
+function isFrontendAnalysis(data) {
+    return data && typeof data === "object" && data.meta?.companyName !== undefined && data.dashboard?.businessHealthScore !== undefined && data.financial?.annualRevenue !== undefined && data.market?.marketSizeB !== undefined;
+}
+function transformBackendAnalysis(raw) {
+    if (!raw) return null;
+    if (isFrontendAnalysis(raw)) return raw;
+    const input = raw.input || {};
+    const summary = raw.summary || {};
+    const financialAnalysis = raw.financialAnalysis || {};
+    const marketAnalysis = raw.marketAnalysis || {};
+    const customerAnalytics = raw.customerAnalytics || {};
+    const riskAssessment = raw.riskAssessment || {};
+    const annualRevenue = Number(financialAnalysis.annualRevenue ?? 0);
+    const profitMarginPercent = Number(financialAnalysis.profitMargin ?? 0);
+    const annualExpenses = Number(input.expenses ?? annualRevenue * (1 - profitMarginPercent / 100) ?? 0);
+    const marketSizeB = Number(marketAnalysis.marketSize ?? 0);
+    const competitorCount = Number(input.competitorCount ?? 0);
+    const growthRatePercent = Number(marketAnalysis.growthRate ?? 0);
+    const marketSharePercent = Number(input.marketShare ?? 0);
+    const customerCount = Number(input.customerCount ?? 0);
+    const churnRatePercent = Number(customerAnalytics.churnRate ?? 0);
+    const retentionPercent = Number(customerAnalytics.retentionRate ?? 0);
+    const nps = Number(customerAnalytics.npsScore ?? 0);
+    const companyName = String(input.companyName ?? "Company");
+    const generatedAt = new Date().toISOString();
+    const investmentReadinessGrade = String(summary.investmentReadiness ?? "B");
+    return {
+        meta: {
+            companyName,
+            generatedAt,
+            model: {
+                targetColumn: "business_health",
+                problemType: "regression"
+            }
+        },
+        dashboard: {
+            businessHealthScore: Number(summary.businessHealth ?? 0),
+            riskLevel: summary.riskLevel ?? "Medium",
+            investmentReadinessGrade,
+            failureProbabilityPercent: Number(summary.failureProbability ?? 0)
+        },
+        financial: {
+            annualRevenue,
+            annualExpenses,
+            profitMarginPercent,
+            burnRateMonthly: Number(financialAnalysis.burnRate ?? 0),
+            runwayMonths: Number(financialAnalysis.runway ?? 0)
+        },
+        market: {
+            marketSizeB,
+            competitorCount,
+            growthRatePercent,
+            marketSharePercent,
+            opportunityScore: Number(marketAnalysis.opportunity ?? 0)
+        },
+        customer: {
+            customerCount,
+            churnRatePercent,
+            nps,
+            retentionPercent
+        },
+        risk: {
+            overallRiskScore: Number(riskAssessment.overallRiskScore ?? 0)
+        }
+    };
 }
 }),
 "[project]/lib/analysis/use-analysis.ts [app-ssr] (ecmascript)", ((__turbopack_context__) => {

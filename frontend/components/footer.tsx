@@ -74,7 +74,6 @@ export default function Footer() {
                 { label: "Financial Analysis", href: "/financial-analysis" },
                 { label: "Risk Assessment", href: "/risk-assessment" },
                 { label: "Investment Insights", href: "/investment" },
-                { label: "AI Recommendations", href: "/recommendations" },
               ].map((link) => (
                 <li key={link.href}>
                   <Link

@@ -14,7 +14,6 @@ import {
   Globe,
   DollarSign,
   Shield,
-  Lightbulb,
   PiggyBank,
   Menu,
   X,
@@ -32,7 +31,6 @@ const navItems = [
   { href: "/market-analysis", label: "Market", icon: Globe },
   { href: "/financial-analysis", label: "Financial", icon: DollarSign },
   { href: "/risk-assessment", label: "Risk", icon: Shield },
-  { href: "/recommendations", label: "AI Insights", icon: Lightbulb },
   { href: "/investment", label: "Investment", icon: PiggyBank },
 ]
 

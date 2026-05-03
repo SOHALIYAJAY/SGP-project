@@ -1,0 +1,13 @@
+{
+  "/_global-error/page": "app/_global-error/page.js",
+  "/_not-found/page": "app/_not-found/page.js",
+  "/company-input/page": "app/company-input/page.js",
+  "/customer-analytics/page": "app/customer-analytics/page.js",
+  "/dashboard/page": "app/dashboard/page.js",
+  "/financial-analysis/page": "app/financial-analysis/page.js",
+  "/investment/page": "app/investment/page.js",
+  "/market-analysis/page": "app/market-analysis/page.js",
+  "/page": "app/page.js",
+  "/predictions/page": "app/predictions/page.js",
+  "/risk-assessment/page": "app/risk-assessment/page.js"
+}

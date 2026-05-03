@@ -105,10 +105,13 @@ class DatabaseStats:
             conn = sqlite3.connect(self.db_path)
             cursor = conn.cursor()
             
-            cursor.execute('''
+            cursor.execute(
+                """
                 INSERT INTO analysis_logs (company_name, analysis_type, confidence_score, created_at)
                 VALUES (?, ?, ?, ?)
-            ''', (company_name, analysis_type, confidence_score))
+                """,
+                (company_name, analysis_type, confidence_score, datetime.now()),
+            )
             
             conn.commit()
             conn.close()
